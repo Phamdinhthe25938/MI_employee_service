@@ -1,0 +1,153 @@
+package com.example.Employee_Service.service.employee;
+
+
+import com.example.Employee_Service.model.dto.communicate_kafka.employee.RegistryEmployeeProducer;
+import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
+import com.example.Employee_Service.model.entity.Employee;
+import com.example.Employee_Service.repository.employee.EmployeeRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.obys.common.constant.Constants;
+import com.obys.common.exception.ErrorV1Exception;
+import com.obys.common.exception.ErrorV2Exception;
+import com.obys.common.kafka.Topic;
+import com.obys.common.model.payload.response.BaseResponse;
+import com.obys.common.service.BaseService;
+import com.obys.common.system_message.SystemMessageCode;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServlet;
+import java.util.Date;
+import java.util.Random;
+
+@Service
+public class EmployeeService extends BaseService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
+
+    @Resource
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Resource
+    private EmployeeRepository employeeRepository;
+
+    @Resource
+    private ModelMapper modelMapper;
+
+    @Resource
+    private ObjectMapper objectMapper;
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public BaseResponse<?> save(AddEmployeeRequest request) {
+        validateSaveEmployee(request);
+        Employee employeeEntity = modelMapper.map(request, Employee.class);
+        String account = buildAccount(request.getFullName());
+        String code = buildCode();
+        employeeEntity.setAccount(account);
+        employeeEntity.setCode(code);
+        Employee employee = employeeRepository.save(employeeEntity);
+        return responseV1(
+                SystemMessageCode.CommonMessage.CODE_SUCCESS,
+                SystemMessageCode.CommonMessage.SAVE_SUCCESS,
+                employee
+        );
+    }
+    private void sendInfoEmployeeAuthor (Employee employee, HttpServlet httpServlet) {
+        try {
+            RegistryEmployeeProducer employeeProducer =
+                    RegistryEmployeeProducer.builder()
+                            .account(employee.getAccount())
+                            .email(employee.getEmail())
+                            .telephone(employee.getTelephone())
+                            .build();
+            ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
+
+        }catch (Exception e){
+             LOGGER.error("[Send message info employee registry to author service  :] ----->" + e.getMessage());
+             throw new ErrorV1Exception(
+                     messageV1Exception(
+                             SystemMessageCode.EmployeeService.CODE_SEND_INFO_EMPLOYEE,
+                             SystemMessageCode.EmployeeService.MESSAGE_SEND_INFO_EMPLOYEE
+                     )
+             );
+        }
+
+
+    }
+
+    private void validateSaveEmployee(AddEmployeeRequest request) {
+        telephoneEmployeeExist(request.getTelephone());
+        emailEmployeeExist(request.getEmail());
+        numberCCCDEmployeeExist(request.getNumberCCCD());
+    }
+
+    private void telephoneEmployeeExist(String telephone) {
+        if (employeeRepository.findByTelephone(telephone).isPresent()) {
+            throw new ErrorV2Exception(messageV2Exception(
+                    SystemMessageCode.EmployeeService.CODE_TELEPHONE_EXIST,
+                    SystemMessageCode.EmployeeService.TELEPHONE,
+                    SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
+            ));
+        }
+    }
+
+    private void emailEmployeeExist(String email) {
+        if (employeeRepository.findByEmail(email).isPresent()) {
+            throw new ErrorV2Exception(messageV2Exception(
+                    SystemMessageCode.EmployeeService.CODE_EMAIL_EXIST,
+                    SystemMessageCode.EmployeeService.EMAIL,
+                    SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
+            ));
+        }
+    }
+
+    private void numberCCCDEmployeeExist(String numberCCCD) {
+        if (employeeRepository.findByNumberCCCD(numberCCCD).isPresent()) {
+            throw new ErrorV2Exception(messageV2Exception(
+                    SystemMessageCode.EmployeeService.CODE_NUMBERCCCD_EXIST,
+                    SystemMessageCode.EmployeeService.NUMBERCCCD,
+                    SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
+            ));
+        }
+    }
+
+    protected String buildAccount(String str) {
+        String account = "";
+        String accountBuild = "";
+        boolean check = true;
+        while (check) {
+            account = reverseString(removeAccent(str)).replaceFirst(" ", ".").replaceAll(" ", "");
+            if (employeeRepository.countByAccount(account) == 0) {
+                accountBuild = account;
+            } else {
+                accountBuild = account + employeeRepository.countByAccount(account);
+            }
+            if (employeeRepository.findByAccount(accountBuild).isEmpty()) {
+                check = false;
+            }
+        }
+        return accountBuild;
+    }
+
+    protected String buildCode() {
+        Random rand = new Random();
+        String yearNow = String.valueOf(new Date().getYear());
+        String codeBuild = "";
+        boolean check = true;
+        while (check) {
+            String codeRandom = String.valueOf(rand.nextInt(89999) + 10000);
+            codeBuild = Constants.Common.VTI_TITLE + "_" + yearNow + codeRandom;
+            if (employeeRepository.findByCode(codeBuild).isEmpty()) {
+                check = false;
+            }
+        }
+        return codeBuild;
+    }
+}
