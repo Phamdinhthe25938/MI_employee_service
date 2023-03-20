@@ -1,5 +1,8 @@
 package com.example.Employee_Service.model.dto.request.employee;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.obys.common.validator.annotation.Gmail;
+import com.obys.common.validator.annotation.Phone;
 import com.obys.common.validator.annotation.Required;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,15 +23,18 @@ public class AddEmployeeRequest {
     private String imageName;
 
     @Required(message = "{is.required}")
+    @Phone(message = "{phone.invalid}")
     private String telephone;
 
     @Required(message = "{is.required}")
+    @Gmail(message = "{gmail.invalid}")
     private String email;
 
     @Required(message = "{is.required}")
     private String numberCCCD;
 
     @Required(message = "{is.required}")
+    @JsonFormat(pattern = "dd-mm-yyyy")
     private Date birthDay;
 
     @Required(message = "{is.required}")

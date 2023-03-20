@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -25,17 +26,17 @@ public class Employee extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Max(20)
+    @Length(max = 50)
     @Unique
     @Column(name = "code")
     private String code;
 
-    @Max(20)
+    @Length(max = 50)
     @Column(name = "account")
     @Unique
     private String account;
 
-    @Max(20)
+    @Length(max = 50)
     @Column(name = "full_name")
     private String fullName;
 
@@ -54,7 +55,7 @@ public class Employee extends BaseEntity {
     @Unique
     private String numberCCCD;
 
-    @JsonFormat(pattern = "dd/mm/yyyy")
+    @JsonFormat(pattern = "dd-mm-yyyy")
     @Column(name = "birthDay")
     private Date birthDay;
 

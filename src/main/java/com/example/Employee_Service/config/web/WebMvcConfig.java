@@ -1,4 +1,4 @@
-package com.example.Employee_Service.config;
+package com.example.Employee_Service.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obys.common.config.i18n.SmartLocaleResolver;

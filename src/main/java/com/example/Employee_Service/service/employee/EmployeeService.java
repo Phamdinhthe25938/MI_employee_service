@@ -5,6 +5,7 @@ import com.example.Employee_Service.model.dto.communicate_kafka.employee.Registr
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.model.entity.Employee;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
+import com.example.Employee_Service.service.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obys.common.constant.Constants;
 import com.obys.common.exception.ErrorV1Exception;
@@ -14,15 +15,18 @@ import com.obys.common.model.payload.response.BaseResponse;
 import com.obys.common.service.BaseService;
 import com.obys.common.system_message.SystemMessageCode;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Random;
 
@@ -30,22 +34,19 @@ import java.util.Random;
 public class EmployeeService extends BaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
-
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
-
     @Resource
     private EmployeeRepository employeeRepository;
-
     @Resource
     private ModelMapper modelMapper;
-
     @Resource
     private ObjectMapper objectMapper;
-
-
+    @Resource
+    private JWTService jwtService;
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<?> save(AddEmployeeRequest request) {
+    public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result) {
+        hasError(result);
         validateSaveEmployee(request);
         Employee employeeEntity = modelMapper.map(request, Employee.class);
         String account = buildAccount(request.getFullName());
@@ -59,7 +60,8 @@ public class EmployeeService extends BaseService {
                 employee
         );
     }
-    private void sendInfoEmployeeAuthor (Employee employee, HttpServlet httpServlet) {
+
+    private void sendInfoEmployeeAuthor(Employee employee, HttpServletRequest httpServlet) {
         try {
             RegistryEmployeeProducer employeeProducer =
                     RegistryEmployeeProducer.builder()
@@ -68,15 +70,16 @@ public class EmployeeService extends BaseService {
                             .telephone(employee.getTelephone())
                             .build();
             ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
-
-        }catch (Exception e){
-             LOGGER.error("[Send message info employee registry to author service  :] ----->" + e.getMessage());
-             throw new ErrorV1Exception(
-                     messageV1Exception(
-                             SystemMessageCode.EmployeeService.CODE_SEND_INFO_EMPLOYEE,
-                             SystemMessageCode.EmployeeService.MESSAGE_SEND_INFO_EMPLOYEE
-                     )
-             );
+            record.headers().add(new RecordHeader(Constants.AuthService.AUTHORIZATION, jwtService.getTokenFromRequest(httpServlet).getBytes()));
+            kafkaTemplate.send(record);
+        } catch (Exception e) {
+            LOGGER.error("[Send message info employee registry to author service  :] ----->" + e.getMessage());
+            throw new ErrorV1Exception(
+                    messageV1Exception(
+                            SystemMessageCode.EmployeeService.CODE_SEND_INFO_EMPLOYEE,
+                            SystemMessageCode.EmployeeService.MESSAGE_SEND_INFO_EMPLOYEE
+                    )
+            );
         }
 
 

@@ -28,6 +28,7 @@ public class JWTService {
         }
         return null;
     }
+
     public String getSubjectFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }

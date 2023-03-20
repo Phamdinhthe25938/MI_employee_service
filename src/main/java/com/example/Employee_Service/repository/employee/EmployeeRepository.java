@@ -14,7 +14,7 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     Optional<Employee> findByCode(@Param("code") String code);
 
 
-    @Query(nativeQuery = true, value = "select count(*) from employee where account = :account")
+    @Query(nativeQuery = true, value = "select count(*) from employee where account like concat('%', :account, '%')")
     int countByAccount(@Param("account") String account);
 
     Optional<Employee> findByAccount(@Param("account") String account);
