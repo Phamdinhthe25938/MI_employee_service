@@ -5,6 +5,7 @@ import com.example.Employee_Service.model.dto.communicate_kafka.employee.Registr
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.model.entity.Employee;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
+import com.example.Employee_Service.repository.employee.PartRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obys.common.constant.Constants;
@@ -25,12 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Random;
 
-@Service
+@Service("EmployeeService")
 public class EmployeeService extends BaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
@@ -38,6 +38,8 @@ public class EmployeeService extends BaseService {
     private KafkaTemplate<String, String> kafkaTemplate;
     @Resource
     private EmployeeRepository employeeRepository;
+    @Resource
+    private PartRepository partRepository;
     @Resource
     private ModelMapper modelMapper;
     @Resource
@@ -52,8 +54,10 @@ public class EmployeeService extends BaseService {
         String account = buildAccount(request.getFullName());
         String code = buildCode();
         employeeEntity.setAccount(account);
+        employeeEntity.setEmailCompany(account);
         employeeEntity.setCode(code);
         Employee employee = employeeRepository.save(employeeEntity);
+//        partRepository.updateTotalMember(employee.getPartId());
         sendInfoEmployeeAuthor(employee, httpServlet);
         return responseV1(
                 SystemMessageCode.CommonMessage.CODE_SUCCESS,
@@ -67,7 +71,7 @@ public class EmployeeService extends BaseService {
             RegistryEmployeeProducer employeeProducer =
                     RegistryEmployeeProducer.builder()
                             .account(employee.getAccount())
-                            .email(employee.getEmail())
+                            .email(employee.getEmailCompany())
                             .telephone(employee.getTelephone())
                             .build();
             ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
@@ -88,7 +92,7 @@ public class EmployeeService extends BaseService {
 
     private void validateSaveEmployee(AddEmployeeRequest request) {
         telephoneEmployeeExist(request.getTelephone());
-        emailEmployeeExist(request.getEmail());
+        emailEmployeePersonalExist(request.getEmailPersonal());
         numberCCCDEmployeeExist(request.getNumberCCCD());
     }
 
@@ -102,11 +106,11 @@ public class EmployeeService extends BaseService {
         }
     }
 
-    private void emailEmployeeExist(String email) {
-        if (employeeRepository.findByEmail(email).isPresent()) {
+    private void emailEmployeePersonalExist(String email) {
+        if (employeeRepository.findByEmailPersonal(email).isPresent()) {
             throw new ErrorV2Exception(messageV2Exception(
                     SystemMessageCode.EmployeeService.CODE_EMAIL_EXIST,
-                    SystemMessageCode.EmployeeService.EMAIL,
+                    SystemMessageCode.EmployeeService.EMAIL_PERSONAL,
                     SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
             ));
         }
@@ -142,7 +146,7 @@ public class EmployeeService extends BaseService {
 
     protected String buildCode() {
         Random rand = new Random();
-        String yearNow = String.valueOf(new Date().getYear());
+        String yearNow = String.valueOf(LocalDate.now().getYear());
         String codeBuild = "";
         boolean check = true;
         while (check) {
@@ -154,4 +158,9 @@ public class EmployeeService extends BaseService {
         }
         return codeBuild;
     }
+
+    protected String buildEmailCompany(String account) {
+        return account + Constants.Common.VTI_EMAIL;
+    }
+
 }

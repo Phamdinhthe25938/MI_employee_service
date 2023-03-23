@@ -47,9 +47,12 @@ public class Employee extends BaseEntity {
     @Unique
     private String telephone;
 
-    @Column(name = "email")
+    @Column(name = "email_company")
     @Unique
-    private String email;
+    private String emailCompany;
+
+    @Column(name = "email_personal")
+    private String emailPersonal;
 
     @Column(name = "number_cccd")
     @Unique

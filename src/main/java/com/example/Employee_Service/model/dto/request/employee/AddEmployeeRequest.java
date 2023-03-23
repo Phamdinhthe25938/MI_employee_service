@@ -28,7 +28,7 @@ public class AddEmployeeRequest {
 
     @Required(message = "{is.required}")
     @Gmail(message = "{gmail.invalid}")
-    private String email;
+    private String emailPersonal;
 
     @Required(message = "{is.required}")
     private String numberCCCD;

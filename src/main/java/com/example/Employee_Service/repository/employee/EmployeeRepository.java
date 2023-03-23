@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Repository("EmployeeRepository")
 public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 
     Optional<Employee> findByCode(@Param("code") String code);
@@ -18,7 +18,8 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     int countByAccount(@Param("account") String account);
 
     Optional<Employee> findByAccount(@Param("account") String account);
-    Optional<Employee> findByEmail(@Param("email") String email);
+    Optional<Employee> findByEmailPersonal(@Param("emailPersonal") String emailPersonal);
+    Optional<Employee> findByEmailCompany(@Param("emailCompany") String emailCompany);
 
     Optional<Employee> findByTelephone(@Param("telephone") String telephone);
 
