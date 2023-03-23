@@ -45,7 +45,7 @@ public class EmployeeService extends BaseService {
     @Resource
     private JWTService jwtService;
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result) {
+    public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
         hasError(result);
         validateSaveEmployee(request);
         Employee employeeEntity = modelMapper.map(request, Employee.class);
@@ -54,6 +54,7 @@ public class EmployeeService extends BaseService {
         employeeEntity.setAccount(account);
         employeeEntity.setCode(code);
         Employee employee = employeeRepository.save(employeeEntity);
+        sendInfoEmployeeAuthor(employee, httpServlet);
         return responseV1(
                 SystemMessageCode.CommonMessage.CODE_SUCCESS,
                 SystemMessageCode.CommonMessage.SAVE_SUCCESS,

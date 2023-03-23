@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -19,8 +20,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> save (@Valid @RequestBody AddEmployeeRequest request, BindingResult result) {
-        employeeService.save(request, result);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> save (@Valid @RequestBody AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
+        return new ResponseEntity<>(employeeService.save(request, result, httpServlet), HttpStatus.OK);
     }
 }
