@@ -15,19 +15,24 @@ import com.obys.common.kafka.Topic;
 import com.obys.common.model.payload.response.BaseResponse;
 import com.obys.common.service.BaseService;
 import com.obys.common.system_message.SystemMessageCode;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.util.Properties;
 import java.util.Random;
 
 @Service("EmployeeService")
@@ -54,10 +59,10 @@ public class EmployeeService extends BaseService {
         String account = buildAccount(request.getFullName());
         String code = buildCode();
         employeeEntity.setAccount(account);
-        employeeEntity.setEmailCompany(account);
+        employeeEntity.setEmailCompany(buildEmailCompany(account));
         employeeEntity.setCode(code);
         Employee employee = employeeRepository.save(employeeEntity);
-//        partRepository.updateTotalMember(employee.getPartId());
+        partRepository.updateTotalMember(employee.getPartId());
         sendInfoEmployeeAuthor(employee, httpServlet);
         return responseV1(
                 SystemMessageCode.CommonMessage.CODE_SUCCESS,
@@ -65,9 +70,9 @@ public class EmployeeService extends BaseService {
                 employee
         );
     }
-
     private void sendInfoEmployeeAuthor(Employee employee, HttpServletRequest httpServlet) {
         try {
+            String correlationId = "12345";
             RegistryEmployeeProducer employeeProducer =
                     RegistryEmployeeProducer.builder()
                             .account(employee.getAccount())
@@ -76,7 +81,25 @@ public class EmployeeService extends BaseService {
                             .build();
             ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
             record.headers().add(new RecordHeader(Constants.AuthService.AUTHORIZATION, jwtService.getTokenFromRequest(httpServlet).getBytes()));
-            kafkaTemplate.send(record);
+            record.headers().add("correlationId", correlationId.getBytes());
+//            kafkaTemplate.send(record);
+
+            Properties props = new Properties();
+            props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+            props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+            props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+            Producer<String, String> producer = new KafkaProducer<>(props);
+            producer.send(record, new Callback() {
+                @Override
+                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                    if (e == null) {
+                        LOGGER.info("Message sent successfully");
+                    } else {
+                        LOGGER.info("Message sent failed");
+                    }
+                    LOGGER.info("Response :" + recordMetadata.hasOffset());
+                }
+            });
         } catch (Exception e) {
             LOGGER.error("[Send message info employee registry to author service  :] ----->" + e.getMessage());
             throw new ErrorV1Exception(
