@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface PartRepository extends CrudRepository<Part, Long> {
 
-
     @Modifying
 //    @Transactional
     @Query(nativeQuery = true, value = "update part as p set p.name = :name where p.id = :id")
