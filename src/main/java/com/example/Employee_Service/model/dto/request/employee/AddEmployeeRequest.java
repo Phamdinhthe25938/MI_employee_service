@@ -45,4 +45,7 @@ public class AddEmployeeRequest {
 
     @Required(message = "{is.required}")
     private Long partId;
+
+    @Required(message = "{is.required}")
+    private Long contactId;
 }
