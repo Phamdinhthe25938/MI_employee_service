@@ -1,4 +1,4 @@
-package com.example.Employee_Service.model.entity;
+package com.example.Employee_Service.model.entity.time_scan_manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.obys.common.model.entity.BaseEntity;

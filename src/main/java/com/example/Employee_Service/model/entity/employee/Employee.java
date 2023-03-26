@@ -1,4 +1,4 @@
-package com.example.Employee_Service.model.entity;
+package com.example.Employee_Service.model.entity.employee;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

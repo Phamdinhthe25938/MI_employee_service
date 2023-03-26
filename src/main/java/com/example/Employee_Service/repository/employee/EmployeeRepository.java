@@ -1,6 +1,6 @@
 package com.example.Employee_Service.repository.employee;
 
-import com.example.Employee_Service.model.entity.Employee;
+import com.example.Employee_Service.model.entity.employee.Employee;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

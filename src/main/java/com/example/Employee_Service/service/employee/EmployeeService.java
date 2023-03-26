@@ -3,7 +3,7 @@ package com.example.Employee_Service.service.employee;
 
 import com.example.Employee_Service.model.dto.communicate_kafka.employee.RegistryEmployeeProducer;
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
-import com.example.Employee_Service.model.entity.Employee;
+import com.example.Employee_Service.model.entity.employee.Employee;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.example.Employee_Service.repository.employee.PartRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
@@ -22,11 +22,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
