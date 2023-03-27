@@ -1,12 +1,12 @@
 package com.example.Employee_Service.model.dto.request.time_scan_manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.obys.common.validator.annotation.Required;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
 import java.util.Date;
 
 @Data
@@ -15,18 +15,11 @@ import java.util.Date;
 @Builder
 public class AddTimeScanRequest {
 
-    @JsonFormat(pattern = "dd-mm-yyyy")
+    @Required(message = "is.required")
+    @JsonFormat(pattern = "dd-mm-yyyy HH:mm:ss")
     private Date timeScan;
 
-    @Column(name = "type_scan")
+    @Required(message = "is.required")
     private Integer typeScan;
 
-    @Column(name = "date_scan")
-    private Integer dateScan;
-
-    @Column(name = "month_scan")
-    private Integer monthScan;
-
-    @Column(name = "year_scan")
-    private Integer yearScan;
 }

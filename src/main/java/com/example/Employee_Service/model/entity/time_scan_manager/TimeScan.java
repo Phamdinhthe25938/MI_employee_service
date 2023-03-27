@@ -3,6 +3,7 @@ package com.example.Employee_Service.model.entity.time_scan_manager;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.obys.common.model.entity.BaseEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "time_scan")
 public class TimeScan extends BaseEntity {
     @Id

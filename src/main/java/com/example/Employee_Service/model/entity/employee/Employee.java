@@ -20,6 +20,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(name = "employee")
 @Entity
+@Builder
 public class Employee extends BaseEntity {
 
     @Id

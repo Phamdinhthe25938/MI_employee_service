@@ -1,6 +1,7 @@
 package com.example.Employee_Service.validate.employee;
 
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
+import com.example.Employee_Service.model.entity.employee.Employee;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.obys.common.exception.ErrorV2Exception;
 import com.obys.common.service.BaseService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 @Component("EmployeeValidator")
 public class EmployeeValidator extends BaseService {
@@ -23,11 +25,17 @@ public class EmployeeValidator extends BaseService {
         numberCCCDEmployeeExist(request.getNumberCCCD());
     }
 
-//    public void accountEmployeeExist(String account) {
-//        if (employeeRepository.findByAccount(account).isEmpty()) {
-//            throw new ErrorV2Exception(me)
-//        }
-//    }
+    public Employee accountEmployeeExist(String account) {
+        Optional<Employee> employee = employeeRepository.findByAccount(account);
+        if (employee.isEmpty()) {
+            throw new ErrorV2Exception(messageV2Exception(
+                    SystemMessageCode.EmployeeService.CODE_ACCOUNT_NOT_EXIST,
+                    SystemMessageCode.EmployeeService.ACCOUNT,
+                    SystemMessageCode.CommonMessage.NOT_EXIST_IN_SYSTEM
+            ));
+        }
+        return employee.get();
+    }
     public void telephoneEmployeeExist(String telephone) {
         if (employeeRepository.findByTelephone(telephone).isPresent()) {
             throw new ErrorV2Exception(messageV2Exception(

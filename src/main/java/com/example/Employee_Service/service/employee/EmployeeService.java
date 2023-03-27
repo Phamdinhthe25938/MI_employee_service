@@ -79,7 +79,6 @@ public class EmployeeService extends BaseService {
     }
     private void sendInfoEmployeeAuthor(Employee employee, HttpServletRequest httpServlet) {
         try {
-            String correlationId = "12345";
             RegistryEmployeeProducer employeeProducer =
                     RegistryEmployeeProducer.builder()
                             .account(employee.getAccount())
@@ -88,7 +87,7 @@ public class EmployeeService extends BaseService {
                             .build();
             ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
             record.headers().add(new RecordHeader(Constants.AuthService.AUTHORIZATION, jwtService.getTokenFromRequest(httpServlet).getBytes()));
-            record.headers().add("correlationId", correlationId.getBytes());
+            record.headers().add(Constants.AuthService.UUID, employee.getUuid().getBytes());
             kafkaTemplate.send(record);
         } catch (Exception e) {
             LOGGER.error("[Send message info employee registry to author service  :] ----->" + e.getMessage());
