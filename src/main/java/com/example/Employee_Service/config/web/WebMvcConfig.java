@@ -64,7 +64,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return validator();
     }
 
-    @Bean
+    @Bean(name = "ModelMapper")
     public ModelMapper getModelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
@@ -72,7 +72,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return modelMapper;
     }
 
-    @Bean
+    @Bean(name = "ObjectMapper")
     public ObjectMapper getObjectMapper() {
         return new ObjectMapper();
     }

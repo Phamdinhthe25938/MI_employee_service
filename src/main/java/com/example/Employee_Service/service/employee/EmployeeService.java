@@ -5,6 +5,7 @@ import com.example.Employee_Service.model.entity.employee.Employee;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.example.Employee_Service.repository.employee.PartRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
+import com.example.Employee_Service.validate.employee.EmployeeValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obys.common.constant.Constants;
 import com.obys.common.exception.ErrorV1Exception;
@@ -19,6 +20,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,19 +39,29 @@ public class EmployeeService extends BaseService {
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
     @Resource
+    @Qualifier("EmployeeRepository")
     private EmployeeRepository employeeRepository;
     @Resource
+    @Qualifier("PartRepository")
     private PartRepository partRepository;
     @Resource
+    @Qualifier("ModelMapper")
     private ModelMapper modelMapper;
     @Resource
+    @Qualifier("ObjectMapper")
     private ObjectMapper objectMapper;
     @Resource
+    @Qualifier("JWTService")
     private JWTService jwtService;
+
+    @Resource
+    @Qualifier("EmployeeValidator")
+    private EmployeeValidator employeeValidator;
+
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
         hasError(result);
-        validateSaveEmployee(request);
+        employeeValidator.validateSaveEmployee(request);
         Employee employeeEntity = modelMapper.map(request, Employee.class);
         String account = buildAccount(request.getFullName());
         String code = buildCode();
@@ -77,24 +89,7 @@ public class EmployeeService extends BaseService {
             ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
             record.headers().add(new RecordHeader(Constants.AuthService.AUTHORIZATION, jwtService.getTokenFromRequest(httpServlet).getBytes()));
             record.headers().add("correlationId", correlationId.getBytes());
-//            kafkaTemplate.send(record);
-
-            Properties props = new Properties();
-            props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-            props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-            props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-            Producer<String, String> producer = new KafkaProducer<>(props);
-            producer.send(record, new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                    if (e == null) {
-                        LOGGER.info("Message sent successfully");
-                    } else {
-                        LOGGER.info("Message sent failed");
-                    }
-                    LOGGER.info("Response :" + recordMetadata.hasOffset());
-                }
-            });
+            kafkaTemplate.send(record);
         } catch (Exception e) {
             LOGGER.error("[Send message info employee registry to author service  :] ----->" + e.getMessage());
             throw new ErrorV1Exception(
@@ -106,42 +101,6 @@ public class EmployeeService extends BaseService {
         }
 
 
-    }
-
-    private void validateSaveEmployee(AddEmployeeRequest request) {
-        telephoneEmployeeExist(request.getTelephone());
-        emailEmployeePersonalExist(request.getEmailPersonal());
-        numberCCCDEmployeeExist(request.getNumberCCCD());
-    }
-
-    private void telephoneEmployeeExist(String telephone) {
-        if (employeeRepository.findByTelephone(telephone).isPresent()) {
-            throw new ErrorV2Exception(messageV2Exception(
-                    SystemMessageCode.EmployeeService.CODE_TELEPHONE_EXIST,
-                    SystemMessageCode.EmployeeService.TELEPHONE,
-                    SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
-            ));
-        }
-    }
-
-    private void emailEmployeePersonalExist(String email) {
-        if (employeeRepository.findByEmailPersonal(email).isPresent()) {
-            throw new ErrorV2Exception(messageV2Exception(
-                    SystemMessageCode.EmployeeService.CODE_EMAIL_EXIST,
-                    SystemMessageCode.EmployeeService.EMAIL_PERSONAL,
-                    SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
-            ));
-        }
-    }
-
-    private void numberCCCDEmployeeExist(String numberCCCD) {
-        if (employeeRepository.findByNumberCCCD(numberCCCD).isPresent()) {
-            throw new ErrorV2Exception(messageV2Exception(
-                    SystemMessageCode.EmployeeService.CODE_NUMBERCCCD_EXIST,
-                    SystemMessageCode.EmployeeService.NUMBERCCCD,
-                    SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
-            ));
-        }
     }
 
     protected String buildAccount(String str) {
