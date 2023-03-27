@@ -23,6 +23,8 @@ public class TimeScan extends BaseEntity {
     @Column(name = "code_employee")
     private String codeEmployee;
 
+    @Column(name = "account_employee")
+    private String accountEmployee;
     @Column(name = "uuid")
     private String uuid;
 
