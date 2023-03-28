@@ -31,7 +31,7 @@ public class TimeScan extends BaseEntity {
     private String uuid;
 
     @Column(name = "time_scan")
-    @JsonFormat(pattern = "dd-mm-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date timeScan;
 
     @Column(name = "type_scan")

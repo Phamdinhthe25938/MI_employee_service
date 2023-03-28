@@ -39,6 +39,7 @@ public class TimeScanService extends BaseService {
         String uuid = getUUID();
         String account = customUserDetails.getUsername();
         Employee employee = employeeValidator.accountEmployeeExist(account);
+        employeeValidator.uuidIsValid(uuid, employee.getUuid());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(request.getTimeScan());
         TimeScan timeScanEntity = TimeScan.builder()

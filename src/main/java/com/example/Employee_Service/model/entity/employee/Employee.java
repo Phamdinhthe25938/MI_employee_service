@@ -65,7 +65,7 @@ public class Employee extends BaseEntity {
     @Unique
     private String numberCCCD;
 
-    @JsonFormat(pattern = "dd-mm-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "birthDay")
     private Date birthDay;
 
@@ -74,11 +74,11 @@ public class Employee extends BaseEntity {
 
     @Column(name = "date_start_join")
     @CreatedDate
-    @JsonFormat(pattern = "dd-mm-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date dateStartJoin;
 
     @Column(name = "date_end_join")
-    @JsonFormat(pattern = "dd-mm-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private Date dateEndJoin;
 
     @Column(name = "position_id")

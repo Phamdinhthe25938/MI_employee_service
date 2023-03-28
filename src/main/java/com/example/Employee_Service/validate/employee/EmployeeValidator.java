@@ -3,6 +3,7 @@ package com.example.Employee_Service.validate.employee;
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.model.entity.employee.Employee;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
+import com.obys.common.exception.ErrorV1Exception;
 import com.obys.common.exception.ErrorV2Exception;
 import com.obys.common.service.BaseService;
 import com.obys.common.system_message.SystemMessageCode;
@@ -25,6 +26,15 @@ public class EmployeeValidator extends BaseService {
         numberCCCDEmployeeExist(request.getNumberCCCD());
     }
 
+    public void uuidIsValid(String uuidRequest, String uuidAccount) {
+        if (!uuidRequest.equals(uuidAccount)) {
+            throw new ErrorV1Exception(messageV1Exception(
+                    SystemMessageCode.CommonMessage.CODE_UUID_IS_NOT_VALID,
+                    SystemMessageCode.CommonMessage.MESSAGE_UUID_IS_NOT_VALID
+            ));
+        }
+    }
+
     public Employee accountEmployeeExist(String account) {
         Optional<Employee> employee = employeeRepository.findByAccount(account);
         if (employee.isEmpty()) {
@@ -36,6 +46,7 @@ public class EmployeeValidator extends BaseService {
         }
         return employee.get();
     }
+
     public void telephoneEmployeeExist(String telephone) {
         if (employeeRepository.findByTelephone(telephone).isPresent()) {
             throw new ErrorV2Exception(messageV2Exception(

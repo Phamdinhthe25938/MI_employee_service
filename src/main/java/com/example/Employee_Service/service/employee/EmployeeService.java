@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.Properties;
 import java.util.Random;
+import java.util.UUID;
 
 @Service("EmployeeService")
 public class EmployeeService extends BaseService {
@@ -58,16 +59,18 @@ public class EmployeeService extends BaseService {
     @Qualifier("EmployeeValidator")
     private EmployeeValidator employeeValidator;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = {Exception.class})
     public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
         hasError(result);
         employeeValidator.validateSaveEmployee(request);
         Employee employeeEntity = modelMapper.map(request, Employee.class);
         String account = buildAccount(request.getFullName());
         String code = buildCode();
+        String uuid = String.valueOf(UUID.randomUUID());
         employeeEntity.setAccount(account);
         employeeEntity.setEmailCompany(buildEmailCompany(account));
         employeeEntity.setCode(code);
+        employeeEntity.setUuid(uuid);
         Employee employee = employeeRepository.save(employeeEntity);
         partRepository.updateTotalMember(employee.getPartId());
         sendInfoEmployeeAuthor(employee, httpServlet);
