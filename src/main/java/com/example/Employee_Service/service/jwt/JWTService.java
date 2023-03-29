@@ -8,6 +8,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Service("JWTService")
@@ -45,5 +46,10 @@ public class JWTService {
 
     private Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
+    }
+
+    public String getRole(String token) {
+        final Claims claims = Jwts.parser().setSigningKey(Constants.AuthService.KEY_PRIVATE).parseClaimsJws(token).getBody();
+        return (String) claims.get(Constants.AuthService.ROLE);
     }
 }

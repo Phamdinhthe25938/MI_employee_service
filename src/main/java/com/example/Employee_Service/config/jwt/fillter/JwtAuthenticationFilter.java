@@ -36,20 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String base64 = request.getHeader("En_code");
             String codeDecrypt = base64EnCode.decrypt(base64);
-            String userName = null;
+            String userName;
             if (codeDecrypt != null) {
                 String token = jwtService.getTokenFromRequest(request);
                 if (token != null) {
                     if (jwtService.validateToken(token)) {
                         userName = jwtService.getSubjectFromToken(token);
-                        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        if (userName != null) {
                                 UserDetails userDetails = new CustomUserDetails(userName);
                                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                         userDetails, request.getHeader(Constants.AuthService.AUTHORIZATION), userDetails.getAuthorities());
-                                authentication
-                                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                                SecurityContextHolder.getContext()
-                                        .setAuthentication(authentication);
+                                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                                SecurityContextHolder.getContext().setAuthentication(authentication);
+                                LOGGER.info("Author : ->" + jwtService.getRole(token));
                             }
                     } else {
                         LOGGER.error("[JwtAuthenticationFilter][doFilterInternal] Token is invalid !");
