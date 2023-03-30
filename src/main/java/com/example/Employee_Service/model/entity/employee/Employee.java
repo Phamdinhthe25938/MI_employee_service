@@ -81,6 +81,9 @@ public class Employee extends BaseEntity {
   @JsonFormat(pattern = "dd-MM-yyyy")
   private Date dateEndJoin;
 
+  @Column(name = "status_work")
+  private Integer statusWork;
+
   @Column(name = "position_id")
   private Long positionId;
 

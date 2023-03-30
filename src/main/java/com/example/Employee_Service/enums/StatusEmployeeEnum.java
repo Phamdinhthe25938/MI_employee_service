@@ -1,25 +1,24 @@
 package com.example.Employee_Service.enums;
 
-public enum TypeScanEnum {
+public enum StatusEmployeeEnum {
+  WORKING(1, "WORKING"),
 
-  SCAN_IN(1, "SCAN_IN"),
+  DESIST(2, "DESIST");
 
-  SCAN_OUT(2, "SCAN_OUT");
-
-  private Integer code;
+  private int code;
 
   private String value;
 
-  TypeScanEnum(Integer code, String value) {
+  StatusEmployeeEnum(int code, String value) {
     this.code = code;
     this.value = value;
   }
 
-  public Integer getCode() {
+  public int getCode() {
     return code;
   }
 
-  public void setCode(Integer code) {
+  public void setCode(int code) {
     this.code = code;
   }
 

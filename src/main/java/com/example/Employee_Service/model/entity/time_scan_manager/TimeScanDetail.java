@@ -19,18 +19,16 @@ public class TimeScanDetail extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
-
+  @Column(name = "account_employee")
+  private String accountEmployee;
   @Column(name = "code_employee")
   private String codeEmployee;
-
   @Column(name = "uuid")
   private String uuid;
-
   @Column(name = "time_office")
   private Integer timeOffice;
-
   @Column(name = "time_reality")
   private Integer timeReality;
-
+  @Column(name = "status")
   private Boolean status;
 }

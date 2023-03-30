@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository("EmployeeRepository")
@@ -25,4 +26,7 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
   Optional<Employee> findByTelephone(@Param("telephone") String telephone);
 
   Optional<Employee> findByNumberCCCD(@Param("numberCCCD") String numberCCCD);
+
+  @Query(nativeQuery = true, value = "select account from employee where status_work = :statusWork")
+  List<String> getAllAccountName(@Param("statusWork") int status);
 }

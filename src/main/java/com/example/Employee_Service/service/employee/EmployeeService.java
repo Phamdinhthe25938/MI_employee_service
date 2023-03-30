@@ -1,5 +1,6 @@
 package com.example.Employee_Service.service.employee;
 
+import com.example.Employee_Service.enums.StatusEmployeeEnum;
 import com.example.Employee_Service.model.dto.communicate_kafka.employee.RegistryEmployeeProducer;
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.model.entity.employee.Employee;
@@ -71,15 +72,17 @@ public class EmployeeService extends BaseService {
     employeeEntity.setEmailCompany(buildEmailCompany(account));
     employeeEntity.setCode(code);
     employeeEntity.setUuid(uuid);
+    employeeEntity.setStatusWork(StatusEmployeeEnum.WORKING.getCode());
     Employee employee = employeeRepository.save(employeeEntity);
     partRepository.updateTotalMember(employee.getPartId());
-//        sendInfoEmployeeAuthor(employee, httpServlet);
+    sendInfoEmployeeAuthor(employee, httpServlet);
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,
         employee
     );
   }
+
   private void sendInfoEmployeeAuthor(Employee employee, HttpServletRequest httpServlet) {
     try {
       RegistryEmployeeProducer employeeProducer =
