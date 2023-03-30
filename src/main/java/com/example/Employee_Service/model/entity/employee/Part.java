@@ -13,14 +13,14 @@ import javax.persistence.*;
 @Entity
 public class Part {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "total_member")
-    private long totalMember = 0;
+  @Column(name = "total_member")
+  private long totalMember = 0;
 }

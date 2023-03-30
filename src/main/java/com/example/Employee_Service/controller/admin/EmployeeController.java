@@ -1,4 +1,4 @@
-package com.example.Employee_Service.controller;
+package com.example.Employee_Service.controller.admin;
 
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.service.employee.EmployeeService;
@@ -13,14 +13,14 @@ import javax.validation.Valid;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/employee")
+@RequestMapping("/api/admin/employee")
 public class EmployeeController {
 
-    @Resource
-    private EmployeeService employeeService;
+  @Resource
+  private EmployeeService employeeService;
 
-    @PostMapping("/save")
-    public ResponseEntity<?> save (@Valid @RequestBody AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
-        return new ResponseEntity<>(employeeService.save(request, result, httpServlet), HttpStatus.OK);
-    }
+  @PostMapping("/save")
+  public ResponseEntity<?> save(@Valid @RequestBody AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
+    return new ResponseEntity<>(employeeService.save(request, result, httpServlet), HttpStatus.OK);
+  }
 }

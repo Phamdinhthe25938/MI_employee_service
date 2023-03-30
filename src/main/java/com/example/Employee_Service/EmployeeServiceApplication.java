@@ -17,9 +17,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 public class EmployeeServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EmployeeServiceApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(EmployeeServiceApplication.class, args);
+  }
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
 }

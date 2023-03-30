@@ -15,22 +15,22 @@ import javax.persistence.*;
 @Table(name = "time_scan_detail")
 public class TimeScanDetail extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "code_employee")
-    private String codeEmployee;
+  @Column(name = "code_employee")
+  private String codeEmployee;
 
-    @Column(name = "uuid")
-    private String uuid;
+  @Column(name = "uuid")
+  private String uuid;
 
-    @Column(name = "time_office")
-    private Integer timeOffice;
+  @Column(name = "time_office")
+  private Integer timeOffice;
 
-    @Column(name = "time_reality")
-    private Integer timeReality;
+  @Column(name = "time_reality")
+  private Integer timeReality;
 
-    private Boolean status;
+  private Boolean status;
 }

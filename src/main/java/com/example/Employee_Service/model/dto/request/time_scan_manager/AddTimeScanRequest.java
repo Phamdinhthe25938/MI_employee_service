@@ -15,11 +15,11 @@ import java.util.Date;
 @Builder
 public class AddTimeScanRequest {
 
-    @Required(message = "is.required")
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private Date timeScan;
+  @Required(message = "is.required")
+  @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+  private Date timeScan;
 
-    @Required(message = "is.required")
-    private Integer typeScan;
+  @Required(message = "is.required")
+  private Integer typeScan;
 
 }

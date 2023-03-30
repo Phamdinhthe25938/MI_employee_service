@@ -21,42 +21,42 @@ import java.util.Calendar;
 @Service("TimeScanService")
 public class TimeScanService extends BaseService {
 
-    @Resource
-    @Qualifier("TimeScanRepository")
-    private TimeScanRepository timeScanRepository;
+  @Resource
+  @Qualifier("TimeScanRepository")
+  private TimeScanRepository timeScanRepository;
 
-    @Resource
-    @Qualifier("EmployeeRepository")
-    private EmployeeRepository employeeRepository;
+  @Resource
+  @Qualifier("EmployeeRepository")
+  private EmployeeRepository employeeRepository;
 
-    @Resource
-    @Qualifier("EmployeeValidator")
-    private EmployeeValidator employeeValidator;
+  @Resource
+  @Qualifier("EmployeeValidator")
+  private EmployeeValidator employeeValidator;
 
 
-    public BaseResponse<?> save(AddTimeScanRequest request) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String uuid = getUUID();
-        String account = customUserDetails.getUsername();
-        Employee employee = employeeValidator.accountEmployeeExist(account);
-        employeeValidator.uuidIsValid(uuid, employee.getUuid());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(request.getTimeScan());
-        TimeScan timeScanEntity = TimeScan.builder()
-                .codeEmployee(employee.getCode())
-                .accountEmployee(account)
-                .uuid(uuid)
-                .timeScan(request.getTimeScan())
-                .typeScan(request.getTypeScan())
-                .dateScan(calendar.get(Calendar.DAY_OF_MONTH))
-                .monthScan(calendar.get(Calendar.MONTH) + 1)
-                .yearScan(calendar.get(Calendar.YEAR))
-                .build();
-        TimeScan timeScan = timeScanRepository.save(timeScanEntity);
-        return responseV1(
-                SystemMessageCode.CommonMessage.CODE_SUCCESS,
-                SystemMessageCode.CommonMessage.SAVE_SUCCESS,
-                timeScan
-        );
-    }
+  public BaseResponse<?> save(AddTimeScanRequest request) {
+    CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    String uuid = getUUID();
+    String account = customUserDetails.getUsername();
+    Employee employee = employeeValidator.accountEmployeeExist(account);
+    employeeValidator.uuidIsValid(uuid, employee.getUuid());
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(request.getTimeScan());
+    TimeScan timeScanEntity = TimeScan.builder()
+        .codeEmployee(employee.getCode())
+        .accountEmployee(account)
+        .uuid(uuid)
+        .timeScan(request.getTimeScan())
+        .typeScan(request.getTypeScan())
+        .dateScan(calendar.get(Calendar.DAY_OF_MONTH))
+        .monthScan(calendar.get(Calendar.MONTH) + 1)
+        .yearScan(calendar.get(Calendar.YEAR))
+        .build();
+    TimeScan timeScan = timeScanRepository.save(timeScanEntity);
+    return responseV1(
+        SystemMessageCode.CommonMessage.CODE_SUCCESS,
+        SystemMessageCode.CommonMessage.SAVE_SUCCESS,
+        timeScan
+    );
+  }
 }

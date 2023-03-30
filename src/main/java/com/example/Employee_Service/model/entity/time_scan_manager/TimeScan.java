@@ -17,33 +17,33 @@ import java.util.Date;
 @Builder
 @Table(name = "time_scan")
 public class TimeScan extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "code_employee")
-    private String codeEmployee;
+  @Column(name = "code_employee")
+  private String codeEmployee;
 
-    @Column(name = "account_employee")
-    private String accountEmployee;
-    @Column(name = "uuid")
-    private String uuid;
+  @Column(name = "account_employee")
+  private String accountEmployee;
+  @Column(name = "uuid")
+  private String uuid;
 
-    @Column(name = "time_scan")
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private Date timeScan;
+  @Column(name = "time_scan")
+  @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+  private Date timeScan;
 
-    @Column(name = "type_scan")
-    private Integer typeScan;
+  @Column(name = "type_scan")
+  private Integer typeScan;
 
-    @Column(name = "date_scan")
-    private Integer dateScan;
+  @Column(name = "date_scan")
+  private Integer dateScan;
 
-    @Column(name = "month_scan")
-    private Integer monthScan;
+  @Column(name = "month_scan")
+  private Integer monthScan;
 
-    @Column(name = "year_scan")
-    private Integer yearScan;
+  @Column(name = "year_scan")
+  private Integer yearScan;
 
 }

@@ -21,25 +21,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //    @Resource
 //    AppUserService appUserService;
 
-    @Resource
-    JwtAuthenticationFilter jwtAuthenticationFilter;
+  @Resource
+  JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
+  @Bean(BeanIds.AUTHENTICATION_MANAGER)
+  @Override
+  public AuthenticationManager authenticationManager() throws Exception {
+    return super.authenticationManager();
+  }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/api/**").permitAll()
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests().antMatchers("/api/**").permitAll()
 //                .and().authorizeRequests().antMatchers("/hello").hasRole("USER")
-                .and().authorizeRequests().anyRequest().authenticated()
-                .and().csrf().disable();
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling();
-        http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
-    }
+        .and().authorizeRequests().anyRequest().authenticated()
+        .and().csrf().disable();
+    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling();
+    http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
+  }
 
 //     xắc thực
 //    @Override

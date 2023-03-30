@@ -1,4 +1,4 @@
-package com.example.Employee_Service.controller;
+package com.example.Employee_Service.controller.employee;
 
 import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeScanRequest;
 import com.example.Employee_Service.service.time_scan_manager.TimeScanService;
@@ -14,15 +14,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/time-scan")
+@RequestMapping("/api/employee/time-scan")
 public class TimeScanController {
 
-    @Resource
-    @Qualifier("TimeScanService")
-    TimeScanService timeScanService;
+  @Resource
+  @Qualifier("TimeScanService")
+  TimeScanService timeScanService;
 
-    @PostMapping("/save")
-    public ResponseEntity<?> save (@Valid @RequestBody AddTimeScanRequest request) {
-        return new ResponseEntity<>(timeScanService.save(request), HttpStatus.OK);
-    }
+  @PostMapping("/save")
+  public ResponseEntity<?> save(@Valid @RequestBody AddTimeScanRequest request) {
+    return new ResponseEntity<>(timeScanService.save(request), HttpStatus.OK);
+  }
 }
