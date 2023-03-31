@@ -87,38 +87,20 @@ public class TimeScanBatch {
             double numberWorkday = hours > 6 ? 1 : 0.5;
             LOGGER.info("Date nax " + objectScanOutMax.getTimeScan() + " Date min " + objectScanInMin.getTimeScan());
             LOGGER.info("Hour :" + hours + " Minutes :" + minutes + " Seconds :" + seconds);
-            timeScanDetail = TimeScanDetail.builder()
-                .accountEmployee(employee.getAccount())
-                .codeEmployee(employee.getCode())
-                .uuid(employee.getUuid())
-                .dateWork(objectScanOutMax.getTimeScan())
-                .timeOffice(Constants.TIME_OFFICE)
-                .timeReality(hours)
-                .statusScanWorkDay(StatusScanDetail.VALID.getCode())
-                .statusWorkdays(statusWorkday)
-                .numberWorkday(numberWorkday)
-                .build();
+            timeScanDetail = buildTimeScanDetailObject(employee, objectScanOutMax.getTimeScan(), hours,
+                StatusScanDetail.VALID.getCode(), statusWorkday, numberWorkday);
           } else {
-            timeScanDetail = TimeScanDetail.builder()
-                .accountEmployee(employee.getAccount())
-                .codeEmployee(employee.getCode())
-                .uuid(employee.getUuid())
-                .dateWork(objectScanOutMax.getTimeScan())
-                .timeOffice(Constants.TIME_OFFICE)
-                .timeReality(0L)
-                .statusScanWorkDay(StatusScanDetail.VALID.getCode())
-                .statusWorkdays(statusWorkday)
-                .numberWorkday(0D)
-                .build();
+            timeScanDetail = buildTimeScanDetailObject(employee, objectScanOutMax.getTimeScan(), 0L,
+                StatusScanDetail.IN_VALID.getCode(), statusWorkday, 0D);
           }
-        }
-        else if (objectScanOutMax == null) {
+        } else if (objectScanOutMax == null) {
 
         }
         timeScanDetailRepository.save(timeScanDetail);
       }
     });
   }
+
   private TimeScanDetail buildTimeScanDetailObject(Employee employee, Date scanTime, Long timeReality,
                                                    Integer statusScanWorkDay, Integer statusWorkDay, Double numberWorkday) {
     return TimeScanDetail.builder()
