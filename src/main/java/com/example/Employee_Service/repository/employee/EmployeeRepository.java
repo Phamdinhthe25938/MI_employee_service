@@ -27,6 +27,6 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
 
   Optional<Employee> findByNumberCCCD(@Param("numberCCCD") String numberCCCD);
 
-  @Query(nativeQuery = true, value = "select account from employee where status_work = :statusWork")
+  @Query(nativeQuery = true, value = "select account from employee where status_work = :statusWork order by id asc ")
   List<String> getAllAccountName(@Param("statusWork") int status);
 }

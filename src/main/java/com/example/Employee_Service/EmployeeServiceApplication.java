@@ -30,7 +30,7 @@ public class EmployeeServiceApplication {
   }
   @PostConstruct
   public void init(){
-    TimeZone.setDefault(TimeZone.getTimeZone("GMT+00:00"));
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
   }
   private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
 }

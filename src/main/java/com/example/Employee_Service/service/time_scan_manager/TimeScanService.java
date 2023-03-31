@@ -53,10 +53,11 @@ public class TimeScanService extends BaseService {
         .yearScan(calendar.get(Calendar.YEAR))
         .build();
     TimeScan timeScan = timeScanRepository.save(timeScanEntity);
+    TimeScan timeScan1 = timeScanRepository.findById(timeScan.getId()).get();
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,
-        timeScan
+        timeScan1
     );
   }
 }

@@ -2,16 +2,18 @@ package com.example.Employee_Service.model.entity.time_scan_manager;
 
 import com.obys.common.model.entity.BaseEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "time_scan_detail")
 public class TimeScanDetail extends BaseEntity {
 
@@ -25,10 +27,17 @@ public class TimeScanDetail extends BaseEntity {
   private String codeEmployee;
   @Column(name = "uuid")
   private String uuid;
+  @Column(name = "date_work")
+  private Date dateWork;
   @Column(name = "time_office")
-  private Integer timeOffice;
+  private Long timeOffice;
   @Column(name = "time_reality")
-  private Integer timeReality;
-  @Column(name = "status")
-  private Boolean status;
+  private Long timeReality;
+  @Column(name = "status_scan_work_day")
+  private Integer statusScanWorkDay;
+  @Column(name = "status_workdays")
+  private Integer statusWorkdays;
+  @Column(name = "number_workday")
+  private Double numberWorkday;
+
 }

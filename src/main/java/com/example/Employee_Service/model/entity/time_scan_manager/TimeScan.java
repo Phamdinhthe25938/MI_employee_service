@@ -32,6 +32,7 @@ public class TimeScan extends BaseEntity {
 
   @Column(name = "time_scan")
   @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date timeScan;
 
   @Column(name = "type_scan")

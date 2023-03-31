@@ -35,7 +35,6 @@ public class AddEmployeeRequest {
   private String numberCCCD;
 
   @Required(message = "{is.required}")
-  @JsonFormat(pattern = "dd-mm-yyyy")
   private Date birthDay;
 
   @Required(message = "{is.required}")
