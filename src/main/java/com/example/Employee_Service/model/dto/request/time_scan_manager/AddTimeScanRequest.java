@@ -15,10 +15,12 @@ import java.util.Date;
 @Builder
 public class AddTimeScanRequest {
 
-  @Required(message = "is.required")
+  @Required(message = "{is.required}")
+  private String account;
+  @Required(message = "{is.required}")
   private Date timeScan;
 
-  @Required(message = "is.required")
+  @Required(message = "{is.required}")
   private Integer typeScan;
 
 }

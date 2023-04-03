@@ -38,6 +38,9 @@ public class TimeScan extends BaseEntity {
   @Column(name = "type_scan")
   private Integer typeScan;
 
+  @Column(name= "days_of_week")
+  private Integer dayOfWeek;
+
   @Column(name = "date_scan")
   private Integer dateScan;
 

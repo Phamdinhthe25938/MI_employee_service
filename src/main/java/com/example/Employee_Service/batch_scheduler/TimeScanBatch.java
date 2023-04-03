@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +60,7 @@ public class TimeScanBatch {
       if (!CollectionUtils.isEmpty(timeScansByAccount)) {
         Employee employee = employeeValidator.accountEmployeeExist(account);
         LOGGER.info("Employee ---->  " + employee.toString());
-        TimeScanDetail timeScanDetail = new TimeScanDetail();
+        TimeScanDetail timeScanDetail;
         TimeScan objectScanInMin = timeScansByAccount.stream()
             .filter(item -> TypeScanEnum.SCAN_IN.getCode().equals(item.getTypeScan()))
             .min(Comparator.comparing(TimeScan::getTimeScan)).orElse(null);
@@ -84,43 +85,29 @@ public class TimeScanBatch {
             long hours = TimeUnit.MILLISECONDS.toHours(durationMillis);
             long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis) - TimeUnit.HOURS.toMinutes(hours);
             long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMillis) - TimeUnit.HOURS.toSeconds(hours) - TimeUnit.MINUTES.toSeconds(minutes);
-            double numberWorkday = hours > 6 ? 1 : 0.5;
+            double numberWorkday = hours >= 6 ? 1 : 0.5;
             LOGGER.info("Date nax " + objectScanOutMax.getTimeScan() + " Date min " + objectScanInMin.getTimeScan());
             LOGGER.info("Hour :" + hours + " Minutes :" + minutes + " Seconds :" + seconds);
-            timeScanDetail = TimeScanDetail.builder()
-                .accountEmployee(employee.getAccount())
-                .codeEmployee(employee.getCode())
-                .uuid(employee.getUuid())
-                .dateWork(objectScanOutMax.getTimeScan())
-                .timeOffice(Constants.TIME_OFFICE)
-                .timeReality(hours)
-                .statusScanWorkDay(StatusScanDetail.VALID.getCode())
-                .statusWorkdays(statusWorkday)
-                .numberWorkday(numberWorkday)
-                .build();
+            timeScanDetail = buildTimeScanDetailObject(employee, objectScanOutMax.getTimeScan(), hours, StatusScanDetail.VALID.getCode(), statusWorkday, numberWorkday);
           } else {
-            timeScanDetail = TimeScanDetail.builder()
-                .accountEmployee(employee.getAccount())
-                .codeEmployee(employee.getCode())
-                .uuid(employee.getUuid())
-                .dateWork(objectScanOutMax.getTimeScan())
-                .timeOffice(Constants.TIME_OFFICE)
-                .timeReality(0L)
-                .statusScanWorkDay(StatusScanDetail.VALID.getCode())
-                .statusWorkdays(statusWorkday)
-                .numberWorkday(0D)
-                .build();
+            timeScanDetail = buildTimeScanDetailObject(employee, objectScanOutMax.getTimeScan(), 0L, StatusScanDetail.IN_VALID.getCode(), statusWorkday, 0D);
           }
-        }
-        else if (objectScanOutMax == null) {
-
+        } else if (objectScanOutMax == null && objectScanInMin != null) {
+          timeScanDetail = buildTimeScanDetailObject(employee, objectScanInMin.getTimeScan(), 0L, StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.BACK_SOON.getCode(), 0D);
+        } else if (objectScanOutMax != null) {
+          timeScanDetail = buildTimeScanDetailObject(employee, objectScanOutMax.getTimeScan(), 0L, StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.LATE.getCode(), 0D);
+        } else {
+          timeScanDetail = buildTimeScanDetailObject(employee, null, 0L, StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.REST.getCode(), 0D);
         }
         timeScanDetailRepository.save(timeScanDetail);
       }
     });
   }
+
   private TimeScanDetail buildTimeScanDetailObject(Employee employee, Date scanTime, Long timeReality,
                                                    Integer statusScanWorkDay, Integer statusWorkDay, Double numberWorkday) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(scanTime);
     return TimeScanDetail.builder()
         .accountEmployee(employee.getAccount())
         .codeEmployee(employee.getCode())
@@ -128,6 +115,7 @@ public class TimeScanBatch {
         .dateWork(scanTime)
         .timeOffice(Constants.TIME_OFFICE)
         .timeReality(timeReality)
+        .dayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
         .statusScanWorkDay(statusScanWorkDay)
         .statusWorkdays(statusWorkDay)
         .numberWorkday(numberWorkday)

@@ -4,6 +4,7 @@ import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeS
 import com.example.Employee_Service.service.time_scan_manager.TimeScanService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -22,7 +23,7 @@ public class TimeScanController {
   TimeScanService timeScanService;
 
   @PostMapping("/save")
-  public ResponseEntity<?> save(@Valid @RequestBody AddTimeScanRequest request) {
-    return new ResponseEntity<>(timeScanService.save(request), HttpStatus.OK);
+  public ResponseEntity<?> save(@Valid @RequestBody AddTimeScanRequest request, BindingResult result) {
+    return new ResponseEntity<>(timeScanService.save(request, result), HttpStatus.OK);
   }
 }

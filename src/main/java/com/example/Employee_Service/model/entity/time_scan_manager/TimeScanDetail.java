@@ -39,5 +39,6 @@ public class TimeScanDetail extends BaseEntity {
   private Integer statusWorkdays;
   @Column(name = "number_workday")
   private Double numberWorkday;
-
+  @Column(name= "days_of_week")
+  private Integer dayOfWeek;
 }
