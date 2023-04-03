@@ -5,7 +5,9 @@ public enum StatusWorkdayEnum {
   ENOUGH(1, "WORKING_ENOUGH"),
   LATE(2, "LATE"),
   BACK_SOON(3, "BACK_SOON"),
-  LATE_BACK_SOON(4, "LATE_BACK_SOON");
+  LATE_BACK_SOON(4, "LATE_BACK_SOON"),
+
+  REST(5, "REST");
   private Integer code;
 
   private String value;

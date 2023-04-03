@@ -14,6 +14,7 @@ import com.obys.common.system_message.SystemMessageCode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
 import java.util.Calendar;
@@ -34,30 +35,29 @@ public class TimeScanService extends BaseService {
   private EmployeeValidator employeeValidator;
 
 
-  public BaseResponse<?> save(AddTimeScanRequest request) {
-    CustomUserDetails customUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+  public BaseResponse<?> save(AddTimeScanRequest request, BindingResult result) {
+    hasError(result);
     String uuid = getUUID();
-    String account = customUserDetails.getUsername();
-    Employee employee = employeeValidator.accountEmployeeExist(account);
+    Employee employee = employeeValidator.accountEmployeeExist(request.getAccount());
     employeeValidator.uuidIsValid(uuid, employee.getUuid());
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(request.getTimeScan());
     TimeScan timeScanEntity = TimeScan.builder()
         .codeEmployee(employee.getCode())
-        .accountEmployee(account)
+        .accountEmployee(employee.getAccount())
         .uuid(uuid)
         .timeScan(request.getTimeScan())
         .typeScan(request.getTypeScan())
+        .dayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
         .dateScan(calendar.get(Calendar.DAY_OF_MONTH))
         .monthScan(calendar.get(Calendar.MONTH) + 1)
         .yearScan(calendar.get(Calendar.YEAR))
         .build();
     TimeScan timeScan = timeScanRepository.save(timeScanEntity);
-    TimeScan timeScan1 = timeScanRepository.findById(timeScan.getId()).get();
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,
-        timeScan1
+        timeScan
     );
   }
 }

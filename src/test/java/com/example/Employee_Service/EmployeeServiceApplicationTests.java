@@ -27,6 +27,11 @@ class EmployeeServiceApplicationTests {
 
     String str1 = strReverse.replaceFirst(" ", ".").replaceAll(" ", "");
     System.out.println(str1);
+
+    String hello = "         the           pham            ";
+
+    String me = hello.strip();
+    System.out.println(me);
   }
 
 }
