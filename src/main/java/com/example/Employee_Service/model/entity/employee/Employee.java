@@ -9,11 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.annotation.CreatedDate;
-
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -67,19 +64,18 @@ public class Employee extends BaseEntity {
 
   @JsonFormat(pattern = "dd-MM-yyyy")
   @Column(name = "birthDay")
-  private Date birthDay;
+  private LocalDate birthDay;
 
   @Column(name = "address")
   private String address;
 
   @Column(name = "date_start_join")
-  @CreatedDate
   @JsonFormat(pattern = "dd-MM-yyyy")
-  private Date dateStartJoin;
+  private LocalDate dateStartJoin;
 
   @Column(name = "date_end_join")
   @JsonFormat(pattern = "dd-MM-yyyy")
-  private Date dateEndJoin;
+  private LocalDate dateEndJoin;
 
   @Column(name = "status_work")
   private Integer statusWork;

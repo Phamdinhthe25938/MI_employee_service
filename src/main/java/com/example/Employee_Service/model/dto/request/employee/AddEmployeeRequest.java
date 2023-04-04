@@ -1,6 +1,5 @@
 package com.example.Employee_Service.model.dto.request.employee;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.obys.common.validator.annotation.Gmail;
 import com.obys.common.validator.annotation.Phone;
 import com.obys.common.validator.annotation.Required;
@@ -9,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,7 +34,7 @@ public class AddEmployeeRequest {
   private String numberCCCD;
 
   @Required(message = "{is.required}")
-  private Date birthDay;
+  private LocalDate birthDay;
 
   @Required(message = "{is.required}")
   private String address;

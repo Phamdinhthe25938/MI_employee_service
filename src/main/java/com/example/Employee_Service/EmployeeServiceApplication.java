@@ -28,9 +28,6 @@ public class EmployeeServiceApplication {
     int year = yesterday.getYear();
     System.out.println(day + "-----" + month+ "----" + year);
   }
-  @PostConstruct
-  public void init(){
-    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-  }
+
   private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
 }

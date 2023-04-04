@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -28,7 +29,7 @@ public class TimeScanDetail extends BaseEntity {
   @Column(name = "uuid")
   private String uuid;
   @Column(name = "date_work")
-  private Date dateWork;
+  private LocalDate dateWork;
   @Column(name = "time_office")
   private Long timeOffice;
   @Column(name = "time_reality")
