@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Component("EmployeeValidator")
@@ -31,6 +32,14 @@ public class EmployeeValidator extends BaseService {
       throw new ErrorV1Exception(messageV1Exception(
           SystemMessageCode.CommonMessage.CODE_UUID_IS_NOT_VALID,
           SystemMessageCode.CommonMessage.MESSAGE_UUID_IS_NOT_VALID
+      ));
+    }
+  }
+  public void accountIsValid(String accountRequest, String accountToken) {
+    if (!accountRequest.equals(accountToken)) {
+      throw new ErrorV1Exception(messageV1Exception(
+          SystemMessageCode.EmployeeService.CODE_ACCOUNT_NOT_MATCH,
+          SystemMessageCode.EmployeeService.MESSAGE_ACCOUNT_NOT_MATCH
       ));
     }
   }

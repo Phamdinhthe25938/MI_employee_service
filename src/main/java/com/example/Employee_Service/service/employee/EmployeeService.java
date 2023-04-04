@@ -32,6 +32,7 @@ import org.springframework.validation.BindingResult;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service("EmployeeService")
@@ -68,10 +69,12 @@ public class EmployeeService extends BaseService {
     String account = buildAccount(request.getFullName());
     String code = buildCode();
     String uuid = String.valueOf(UUID.randomUUID());
+    LocalDate timeStartJoinJob = LocalDate.now();
     employeeEntity.setAccount(account);
     employeeEntity.setEmailCompany(buildEmailCompany(account));
     employeeEntity.setCode(code);
     employeeEntity.setUuid(uuid);
+    employeeEntity.setDateStartJoin(timeStartJoinJob);
     employeeEntity.setStatusWork(StatusEmployeeEnum.WORKING.getCode());
     Employee employee = employeeRepository.save(employeeEntity);
     partRepository.updateTotalMember(employee.getPartId());

@@ -1,6 +1,7 @@
 package com.example.Employee_Service.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.obys.common.config.i18n.SmartLocaleResolver;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -76,7 +77,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   @Bean(name = "ObjectMapper")
   public ObjectMapper getObjectMapper() {
-    return new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    return objectMapper;
   }
 
 }

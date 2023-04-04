@@ -8,8 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
-
+import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,8 +31,7 @@ public class TimeScan extends BaseEntity {
 
   @Column(name = "time_scan")
   @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date timeScan;
+  private LocalDateTime timeScan;
 
   @Column(name = "type_scan")
   private Integer typeScan;
