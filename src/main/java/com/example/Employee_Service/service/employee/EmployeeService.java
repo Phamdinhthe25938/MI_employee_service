@@ -3,23 +3,20 @@ package com.example.Employee_Service.service.employee;
 import com.example.Employee_Service.enums.StatusEmployeeEnum;
 import com.example.Employee_Service.model.dto.communicate_kafka.employee.RegistryEmployeeProducer;
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
-import com.example.Employee_Service.model.entity.employee.Employee;
+import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.example.Employee_Service.repository.employee.PartRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obys.common.constant.Constants;
-import com.obys.common.enums.RoleEnum;
 import com.obys.common.exception.ErrorV1Exception;
-import com.obys.common.exception.ErrorV2Exception;
 import com.obys.common.kafka.Topic;
 import com.obys.common.model.payload.response.BaseResponse;
 import com.obys.common.service.BaseService;
 import com.obys.common.system_message.SystemMessageCode;
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +29,8 @@ import org.springframework.validation.BindingResult;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Random;
+import java.util.UUID;
 
 @Service("EmployeeService")
 public class EmployeeService extends BaseService {
@@ -65,7 +62,7 @@ public class EmployeeService extends BaseService {
   public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
     hasError(result);
     employeeValidator.validateSaveEmployee(request);
-    Employee employeeEntity = modelMapper.map(request, Employee.class);
+    EmployeeEntity employeeEntity = modelMapper.map(request, EmployeeEntity.class);
     String account = buildAccount(request.getFullName());
     String code = buildCode();
     String uuid = String.valueOf(UUID.randomUUID());
@@ -76,7 +73,7 @@ public class EmployeeService extends BaseService {
     employeeEntity.setUuid(uuid);
     employeeEntity.setDateStartJoin(timeStartJoinJob);
     employeeEntity.setStatusWork(StatusEmployeeEnum.WORKING.getCode());
-    Employee employee = employeeRepository.save(employeeEntity);
+    EmployeeEntity employee = employeeRepository.save(employeeEntity);
     partRepository.updateTotalMember(employee.getPartId());
     sendInfoEmployeeAuthor(employee, httpServlet);
     return responseV1(
@@ -86,7 +83,7 @@ public class EmployeeService extends BaseService {
     );
   }
 
-  private void sendInfoEmployeeAuthor(Employee employee, HttpServletRequest httpServlet) {
+  private void sendInfoEmployeeAuthor(EmployeeEntity employee, HttpServletRequest httpServlet) {
     try {
       RegistryEmployeeProducer employeeProducer =
           RegistryEmployeeProducer.builder()

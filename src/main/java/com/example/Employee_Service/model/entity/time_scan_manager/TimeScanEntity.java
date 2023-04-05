@@ -2,20 +2,18 @@ package com.example.Employee_Service.model.entity.time_scan_manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.obys.common.model.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "time_scan")
-public class TimeScan extends BaseEntity {
+public class TimeScanEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Builder
 @Table(name = "log_time_scan")
-public class LogTimeScan {
+public class LogTimeScanEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")

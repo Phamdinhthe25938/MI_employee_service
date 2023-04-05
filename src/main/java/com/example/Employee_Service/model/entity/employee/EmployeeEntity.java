@@ -3,22 +3,20 @@ package com.example.Employee_Service.model.entity.employee;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.obys.common.model.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.checkerframework.common.aliasing.qual.Unique;
 import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "employee")
 @Entity
 @Builder
-public class Employee extends BaseEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "employee")
+public class EmployeeEntity extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
