@@ -1,11 +1,9 @@
 package com.example.Employee_Service.service.time_scan_manager;
 
 
-import com.example.Employee_Service.model.dto.CustomUserDetails;
 import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeScanRequest;
-import com.example.Employee_Service.model.entity.employee.Employee;
-import com.example.Employee_Service.model.entity.time_scan_manager.TimeScan;
-import com.example.Employee_Service.repository.employee.EmployeeRepository;
+import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
+import com.example.Employee_Service.model.entity.time_scan_manager.TimeScanEntity;
 import com.example.Employee_Service.repository.time_scan_manager.TimeScanRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
@@ -36,10 +34,10 @@ public class TimeScanService extends BaseService {
   public BaseResponse<?> save(AddTimeScanRequest request, BindingResult result, HttpServletRequest servletRequest) {
     hasError(result);
     String uuid = getUUID(servletRequest);
-    Employee employee = employeeValidator.accountEmployeeExist(request.getAccount());
+    EmployeeEntity employee = employeeValidator.accountEmployeeExist(request.getAccount());
     employeeValidator.uuidIsValid(uuid, employee.getUuid());
     employeeValidator.accountIsValid(request.getAccount(), jwtService.getSubjectFromToken(jwtService.getTokenFromRequest(servletRequest)));
-    TimeScan timeScanEntity = TimeScan.builder()
+    TimeScanEntity timeScanEntity = TimeScanEntity.builder()
         .codeEmployee(employee.getCode())
         .accountEmployee(employee.getAccount())
         .uuid(uuid)
@@ -50,7 +48,7 @@ public class TimeScanService extends BaseService {
         .monthScan(request.getTimeScan().getMonth().getValue())
         .yearScan(request.getTimeScan().getYear())
         .build();
-    TimeScan timeScan = timeScanRepository.save(timeScanEntity);
+    TimeScanEntity timeScan = timeScanRepository.save(timeScanEntity);
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,

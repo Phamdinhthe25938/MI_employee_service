@@ -3,6 +3,7 @@ package com.example.Employee_Service.config.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.obys.common.config.i18n.SmartLocaleResolver;
+import com.obys.common.validator.regex.RegexHelper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.MessageSource;
@@ -82,5 +83,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     return objectMapper;
   }
 
+  @Bean(name = "RegexHelper")
+  public RegexHelper getRegexHelper() {
+    return new RegexHelper();
+  }
 }
 

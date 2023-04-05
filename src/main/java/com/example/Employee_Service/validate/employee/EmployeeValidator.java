@@ -1,17 +1,17 @@
 package com.example.Employee_Service.validate.employee;
 
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
-import com.example.Employee_Service.model.entity.employee.Employee;
+import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.obys.common.exception.ErrorV1Exception;
 import com.obys.common.exception.ErrorV2Exception;
 import com.obys.common.service.BaseService;
 import com.obys.common.system_message.SystemMessageCode;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Component("EmployeeValidator")
@@ -44,8 +44,20 @@ public class EmployeeValidator extends BaseService {
     }
   }
 
-  public Employee accountEmployeeExist(String account) {
-    Optional<Employee> employee = employeeRepository.findByAccount(account);
+  public EmployeeEntity employeeExist(Long id) {
+    EmployeeEntity employee = employeeRepository.findById(id).orElse(null);
+    if (ObjectUtils.isEmpty(employee)) {
+      throw new ErrorV2Exception(messageV2Exception(
+          SystemMessageCode.EmployeeService.CODE_ACCOUNT_NOT_EXIST,
+          SystemMessageCode.EmployeeService.ACCOUNT,
+          SystemMessageCode.CommonMessage.NOT_EXIST_IN_SYSTEM
+      ));
+    }
+    return employee;
+  }
+
+  public EmployeeEntity accountEmployeeExist(String account) {
+    Optional<EmployeeEntity> employee = employeeRepository.findByAccount(account);
     if (employee.isEmpty()) {
       throw new ErrorV2Exception(messageV2Exception(
           SystemMessageCode.EmployeeService.CODE_ACCOUNT_NOT_EXIST,

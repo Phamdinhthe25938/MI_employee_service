@@ -1,6 +1,6 @@
 package com.example.Employee_Service.repository.employee;
 
-import com.example.Employee_Service.model.entity.employee.Employee;
+import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -10,22 +10,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository("EmployeeRepository")
-public interface EmployeeRepository extends CrudRepository<Employee, Long> {
+public interface EmployeeRepository extends CrudRepository<EmployeeEntity, Long> {
 
-  Optional<Employee> findByCode(@Param("code") String code);
+  Optional<EmployeeEntity> findByCode(@Param("code") String code);
 
   @Query(nativeQuery = true, value = "select count(*) from employee where account like concat('%', :account, '%')")
   int countByAccount(@Param("account") String account);
 
-  Optional<Employee> findByAccount(@Param("account") String account);
+  Optional<EmployeeEntity> findByAccount(@Param("account") String account);
 
-  Optional<Employee> findByEmailPersonal(@Param("emailPersonal") String emailPersonal);
+  Optional<EmployeeEntity> findByEmailPersonal(@Param("emailPersonal") String emailPersonal);
 
-  Optional<Employee> findByEmailCompany(@Param("emailCompany") String emailCompany);
+  Optional<EmployeeEntity> findByEmailCompany(@Param("emailCompany") String emailCompany);
 
-  Optional<Employee> findByTelephone(@Param("telephone") String telephone);
+  Optional<EmployeeEntity> findByTelephone(@Param("telephone") String telephone);
 
-  Optional<Employee> findByNumberCCCD(@Param("numberCCCD") String numberCCCD);
+  Optional<EmployeeEntity> findByNumberCCCD(@Param("numberCCCD") String numberCCCD);
 
   @Query(nativeQuery = true, value = "select account from employee where status_work = :statusWork order by id asc ")
   List<String> getAllAccountName(@Param("statusWork") int status);
