@@ -1,8 +1,7 @@
 package com.example.Employee_Service.model.entity.employee;
 
-import com.example.Employee_Service.model.ObjectNodeConverter;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.obys.common.model.commom.ObjectNodeConverter;
 import com.obys.common.model.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
