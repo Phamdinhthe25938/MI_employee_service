@@ -38,7 +38,7 @@ public class TimeScanService extends BaseService {
 
   public BaseResponse<?> save(AddTimeScanRequest request, BindingResult result, HttpServletRequest servletRequest) {
     hasError(result);
-    String uuid = getUUID(servletRequest);
+    String uuid = getUUID();
     EmployeeEntity employee = employeeValidator.accountEmployeeExist(request.getAccount());
     employeeValidator.uuidIsValid(uuid, employee.getUuid());
     employeeValidator.accountIsValid(request.getAccount(), jwtService.getSubjectFromToken(jwtService.getTokenFromRequest(servletRequest)));
