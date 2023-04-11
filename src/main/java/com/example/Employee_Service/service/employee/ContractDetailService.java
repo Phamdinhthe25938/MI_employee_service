@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import javax.annotation.Resource;
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 @Service("ContractDetailService")
@@ -41,10 +39,10 @@ public class ContractDetailService extends BaseService {
     if (!ObjectUtils.isEmpty(request.getSalarySubsidize())) {
       ObjectNode salarySubsidize = request.getSalarySubsidize();
       Iterator<String> fields = salarySubsidize.fieldNames();
-      if (fields.hasNext()) {
-        regexHelper.regexNumber(salarySubsidize.get(fields.next()).asText());
-        totalSalary += salarySubsidize.get(fields.next()).longValue();
-
+      while (fields.hasNext()) {
+        String value = salarySubsidize.get(fields.next()).asText();
+        regexHelper.regexNumber(value);
+        totalSalary += Long.parseLong(value);
       }
     }
     totalSalary += request.getSalaryBasic();

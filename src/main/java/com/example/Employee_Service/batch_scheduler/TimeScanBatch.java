@@ -17,7 +17,9 @@ import com.obys.common.constant.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -50,6 +52,9 @@ public class TimeScanBatch {
   @Resource
   @Qualifier("LogTimeScanRepository")
   private LogTimeScanRepository logTimeScanRepository;
+
+  @Resource
+  private TaskScheduler taskScheduler;
 
   @Scheduled(cron = "${time.scan.scheduler}")
   @Transactional(rollbackFor = Exception.class)
@@ -120,6 +125,12 @@ public class TimeScanBatch {
     });
   }
 
+  @Scheduled(cron = "10 * * * * *")
+  public void changeCron() {
+    CronTrigger cronTrigger = new CronTrigger("15 * * * * *");
+    taskScheduler.schedule(this::timeScanBatch, cronTrigger);
+    LOGGER.info("Change cron success !");
+  }
   private TimeScanDetailEntity buildTimeScanDetailObject(EmployeeEntity employee, LocalDate dateWork, Long timeReality,
                                                          Integer statusScanWorkDay, Integer statusWorkDay, Double numberWorkday) {
     return TimeScanDetailEntity.builder()

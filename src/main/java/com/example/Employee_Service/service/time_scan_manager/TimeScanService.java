@@ -4,6 +4,7 @@ package com.example.Employee_Service.service.time_scan_manager;
 import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeScanRequest;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.model.entity.time_scan_manager.TimeScanEntity;
+import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.example.Employee_Service.repository.time_scan_manager.TimeScanRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
@@ -29,6 +30,10 @@ public class TimeScanService extends BaseService {
   @Resource
   @Qualifier("JWTService")
   private JWTService jwtService;
+
+  @Resource
+  @Qualifier("EmployeeRepository")
+  private EmployeeRepository employeeRepository;
 
 
   public BaseResponse<?> save(AddTimeScanRequest request, BindingResult result, HttpServletRequest servletRequest) {
