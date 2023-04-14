@@ -8,7 +8,6 @@ import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.model.entity.employee.LogCalculationSalaryEntity;
 import com.example.Employee_Service.model.entity.time_scan_manager.TimeScanDateDetailEntity;
 import com.example.Employee_Service.repository.employee.CalculationSalaryRepository;
-import com.example.Employee_Service.repository.employee.ContractDetailRepository;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.example.Employee_Service.repository.employee.LogCalculationSalaryRepository;
 import com.example.Employee_Service.repository.time_scan_manager.TimeScanDateDetailRepository;
@@ -62,7 +61,7 @@ public class CalculationSalaryBatch extends BaseService {
       List<TimeScanDateDetailEntity> timeScanDateDetailByMonth = timeScanDateDetailRepository.getAllByMonth(firstDayOfMonth, lastDayOfMonth);
 
       allAccount.forEach(account -> {
-        LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccount(account).orElse(null);
+        LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccountAndMonthWork(account, yesterday).orElse(null);
         if (logCalculationSalaryEntity == null || Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
 
           EmployeeEntity employee = employeeValidator.accountEmployeeExist(account);
@@ -110,14 +109,14 @@ public class CalculationSalaryBatch extends BaseService {
             logCalculationSalary = LogCalculationSalaryEntity.builder()
                 .account(account)
                 .status(Boolean.TRUE)
-                .month_work(lastDayOfMonth)
+                .monthWork(lastDayOfMonth)
                 .build();
           } else if (Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
             logCalculationSalary = LogCalculationSalaryEntity.builder()
                 .id(logCalculationSalaryEntity.getId())
                 .account(account)
                 .status(Boolean.TRUE)
-                .month_work(lastDayOfMonth)
+                .monthWork(lastDayOfMonth)
                 .build();
           }
           logCalculationSalaryRepository.save(logCalculationSalary);

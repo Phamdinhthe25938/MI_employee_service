@@ -58,6 +58,7 @@ public class EmployeeService extends BaseService {
   @Qualifier("EmployeeValidator")
   private EmployeeValidator employeeValidator;
 
+
   @Transactional(rollbackFor = {Exception.class})
   public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
     hasError(result);
