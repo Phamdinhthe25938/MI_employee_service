@@ -4,6 +4,7 @@ import com.example.Employee_Service.enums.StatusEmployeeEnum;
 import com.example.Employee_Service.model.dto.communicate_kafka.employee.RegistryEmployeeProducer;
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
+import com.example.Employee_Service.model.entity.employee.PositionEntity;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
 import com.example.Employee_Service.repository.employee.PartRepository;
 import com.example.Employee_Service.service.jwt.JWTService;
@@ -53,7 +54,6 @@ public class EmployeeService extends BaseService {
   @Resource
   @Qualifier("JWTService")
   private JWTService jwtService;
-
   @Resource
   @Qualifier("EmployeeValidator")
   private EmployeeValidator employeeValidator;
@@ -62,6 +62,7 @@ public class EmployeeService extends BaseService {
   public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
     hasError(result);
     employeeValidator.validateSaveEmployee(request);
+    PositionEntity positionEntity = employeeValidator.checkPositionExist(request.getPositionId());
     EmployeeEntity employeeEntity = modelMapper.map(request, EmployeeEntity.class);
     String account = buildAccount(request.getFullName());
     String code = buildCode();

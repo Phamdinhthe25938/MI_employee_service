@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "time_scan_detail")
-public class TimeScanDetailEntity extends BaseEntity {
+@Table(name = "time_scan_date_detail")
+public class TimeScanDateDetailEntity extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +28,10 @@ public class TimeScanDetailEntity extends BaseEntity {
   private String uuid;
   @Column(name = "date_work")
   private LocalDate dateWork;
+  @Column(name = "time_scan_in_start")
+  private LocalDateTime timeScanInStart;
+  @Column(name = "time_scan_out_end")
+  private LocalDateTime timeScanOutEnd;
   @Column(name = "time_office")
   private Long timeOffice;
   @Column(name = "time_reality")

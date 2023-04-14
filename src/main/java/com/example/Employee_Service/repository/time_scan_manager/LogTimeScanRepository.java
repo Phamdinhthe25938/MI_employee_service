@@ -7,10 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository("LogTimeScanRepository")
 public interface LogTimeScanRepository extends CrudRepository<LogTimeScanEntity, Long> {
 
   @Query(nativeQuery = true, value = "select status from log_time_scan where date_work = :dateWork and account = :account")
   Boolean getStatusByDateAndAccount(@Param("dateWork") LocalDate dateWork, @Param("account") String account);
+
+  Optional<LogTimeScanEntity> findByAccount(String account);
 }

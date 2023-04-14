@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -37,6 +38,9 @@ public class CalculationSalaryEntity extends BaseEntity {
   @Column(name = "total_days_enough")
   private Long totalDaysEnough;
   @NotNull
+  @Column(name = "work_days")
+  private Double workDays;
+  @NotNull
   @Column(name = "total_days_off_permission")
   private Long totalDaysOffPermission;
   @NotNull
@@ -44,5 +48,5 @@ public class CalculationSalaryEntity extends BaseEntity {
   private Long totalDaysOfMonth;
   @NotNull
   @Column(name = "total_salary_of_month")
-  private Long totalSalaryOfMonth;
+  private Double totalSalaryOfMonth;
 }

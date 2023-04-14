@@ -2,7 +2,9 @@ package com.example.Employee_Service.validate.employee;
 
 import com.example.Employee_Service.model.dto.request.employee.AddEmployeeRequest;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
+import com.example.Employee_Service.model.entity.employee.PositionEntity;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
+import com.example.Employee_Service.repository.employee.PositionRepository;
 import com.obys.common.exception.ErrorV1Exception;
 import com.obys.common.exception.ErrorV2Exception;
 import com.obys.common.service.BaseService;
@@ -20,6 +22,10 @@ public class EmployeeValidator extends BaseService {
   @Resource
   @Qualifier("EmployeeRepository")
   private EmployeeRepository employeeRepository;
+
+  @Resource
+  @Qualifier("PositionRepository")
+  private PositionRepository positionRepository;
 
   public void validateSaveEmployee(AddEmployeeRequest request) {
     telephoneEmployeeExist(request.getTelephone());
@@ -96,5 +102,14 @@ public class EmployeeValidator extends BaseService {
           SystemMessageCode.CommonMessage.EXIST_IN_SYSTEM
       ));
     }
+  }
+
+  public PositionEntity checkPositionExist(Long id) {
+    PositionEntity entity = positionRepository.findById(id).orElse(null);
+    if (entity == null) {
+      throw new ErrorV2Exception(messageV2Exception(SystemMessageCode.EmployeeService.CODE_POSITION_NOT_EXIST,
+          SystemMessageCode.EmployeeService.POSITION, SystemMessageCode.CommonMessage.NOT_EXIST_IN_SYSTEM));
+    }
+    return entity;
   }
 }
