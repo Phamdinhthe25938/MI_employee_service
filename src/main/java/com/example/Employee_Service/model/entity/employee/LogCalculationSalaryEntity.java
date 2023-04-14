@@ -1,7 +1,6 @@
 package com.example.Employee_Service.model.entity.employee;
 
 import com.obys.common.model.entity.BaseEntity;
-import com.obys.common.service.BaseService;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,7 +22,7 @@ public class LogCalculationSalaryEntity extends BaseEntity {
   private String account;
 
   @Column(name = "month_work")
-  private LocalDate month_work;
+  private LocalDate monthWork;
 
   @Column(name = "status")
   private Boolean status;

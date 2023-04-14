@@ -15,5 +15,5 @@ public interface LogTimeScanRepository extends CrudRepository<LogTimeScanEntity,
   @Query(nativeQuery = true, value = "select status from log_time_scan where date_work = :dateWork and account = :account")
   Boolean getStatusByDateAndAccount(@Param("dateWork") LocalDate dateWork, @Param("account") String account);
 
-  Optional<LogTimeScanEntity> findByAccount(String account);
+  Optional<LogTimeScanEntity> findByAccountAndDateWork(String account, LocalDate dateWork);
 }

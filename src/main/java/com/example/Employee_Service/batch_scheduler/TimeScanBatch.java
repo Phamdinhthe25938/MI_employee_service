@@ -72,7 +72,7 @@ public class TimeScanBatch {
 
     List<TimeScanEntity> timeScans = timeScanRepository.getAllByDateScanAndMonthScanAndYearScan(day, month, year);
     allAccount.forEach(account -> {
-      LogTimeScanEntity logTimeScanEntity = logTimeScanRepository.findByAccount(account).orElse(null);
+      LogTimeScanEntity logTimeScanEntity = logTimeScanRepository.findByAccountAndDateWork(account, yesterday).orElse(null);
       if (ObjectUtils.isEmpty(logTimeScanEntity) || Boolean.FALSE.equals(logTimeScanEntity.getStatus())) {
         TimeScanDateDetailEntity timeScanDetail = null;
         List<TimeScanEntity> timeScansByAccount = timeScans.stream().filter(item -> item.getAccountEmployee().equals(account)).collect(Collectors.toList());

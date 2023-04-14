@@ -20,6 +20,11 @@ public class AllAccessController {
   @Qualifier("TimeScanService")
   TimeScanService timeScanService;
 
+  @GetMapping("/time-scan/getAll")
+  public ResponseEntity<?> getAll() {
+    return new ResponseEntity<>(timeScanService.search(), HttpStatus.OK);
+  }
+
   @PostMapping("/time-scan/save")
   public ResponseEntity<?> save(@Valid @RequestBody AddTimeScanRequest request, BindingResult result, HttpServletRequest servletRequest) {
     return new ResponseEntity<>(timeScanService.save(request, result, servletRequest), HttpStatus.OK);
