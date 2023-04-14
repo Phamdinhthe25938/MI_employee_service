@@ -41,7 +41,7 @@ public class ContractDetailService extends BaseService {
       Iterator<String> fields = salarySubsidize.fieldNames();
       while (fields.hasNext()) {
         String value = salarySubsidize.get(fields.next()).asText();
-        regexHelper.regexNumber(value);
+        regexHelper.regexNumber(value, SystemMessageCode.EmployeeService.SALARY_SUBSIDIZE);
         totalSalary += Long.parseLong(value);
       }
     }

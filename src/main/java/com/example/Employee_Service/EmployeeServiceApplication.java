@@ -17,17 +17,9 @@ import java.util.TimeZone;
 @EnableFeignClients
 @EnableScheduling
 public class EmployeeServiceApplication {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
   public static void main(String[] args) {
     SpringApplication.run(EmployeeServiceApplication.class, args);
-
-    LocalDate currentDate = LocalDate.now();
-    LocalDate yesterday = currentDate.minusDays(1);
-    int day = yesterday.getDayOfMonth();
-    int month = yesterday.getMonthValue();
-    int year = yesterday.getYear();
-    System.out.println(day + "-----" + month+ "----" + year);
   }
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
 }
