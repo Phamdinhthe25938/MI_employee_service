@@ -22,6 +22,7 @@ public class AddLogVacationDayRequest {
   @Required(message = "{date.log.vacation.is.required}")
   private LocalDate dateLogVacation;
   @Required(message = "{reason.rest.is.required}")
+  @Max(1000)
   private String reasonRest;
   @Required(message = "{type.day.log.is.required}")
   @Min(1)
