@@ -1,6 +1,4 @@
 package com.example.Employee_Service.repository.employee;
-
-import com.example.Employee_Service.model.dto.request.employee.GetInfoEmployeeDto;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

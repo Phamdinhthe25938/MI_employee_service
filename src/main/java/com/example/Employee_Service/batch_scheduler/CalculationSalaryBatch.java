@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,25 +49,25 @@ public class CalculationSalaryBatch extends BaseService {
   @Scheduled(cron = "10 * * * * *")
   public void calculationSalary() {
     try {
-      LocalDate currentDate = LocalDate.now();
-      LocalDate yesterday = currentDate.minusMonths(1);
-      LOGGER.info("Calculation salary date now :" + currentDate);
-      LOGGER.info("Calculation salary yesterday now :" + yesterday);
+      YearMonth currentMonth = YearMonth.now();
+      YearMonth lastMonth = currentMonth.minusMonths(1);
+      LOGGER.info("Calculation salary date now :" + currentMonth);
+      LOGGER.info("Calculation salary yesterday now :" + lastMonth);
 
-      LocalDate firstDayOfMonth = yesterday.withDayOfMonth(1);
-      LocalDate lastDayOfMonth = yesterday.withDayOfMonth(yesterday.lengthOfMonth());
+      LocalDate firstDayOfMonth = lastMonth.atDay(1);
+      LocalDate lastDayOfMonth = lastMonth.atEndOfMonth();
       LOGGER.info("Calculation salary first day of month:" + firstDayOfMonth);
       LOGGER.info("Calculation salary last day of month :" + lastDayOfMonth);
       List<String> allAccount = employeeRepository.getAllAccountName(StatusEmployeeEnum.WORKING.getCode());
       List<TimeScanDateDetailEntity> timeScanDateDetailByMonth = timeScanDateDetailRepository.getAllByMonth(firstDayOfMonth, lastDayOfMonth);
 
       allAccount.forEach(account -> {
-        LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccountAndMonthWork(account, yesterday).orElse(null);
+        LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccountAndMonthWork(account, lastMonth).orElse(null);
         if (logCalculationSalaryEntity == null || Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
 
           EmployeeEntity employee = employeeValidator.accountEmployeeExist(account);
           ContractDetailEntity contractDetailEntity = contractDetailValidator.checkEmployeeExist(employee.getId());
-          Long totalDaysOfMonth = calculationDayMonth(yesterday.getMonth().getValue(), yesterday.getYear());
+          Long totalDaysOfMonth = calculationDayMonth(lastMonth.getMonth().getValue(), lastMonth.getYear());
 
           // Get list time scan by month and year of account
           List<TimeScanDateDetailEntity> timeScanDateDetailByMonthOfAccount = timeScanDateDetailByMonth.
@@ -92,12 +93,14 @@ public class CalculationSalaryBatch extends BaseService {
           }
           CalculationSalaryEntity calculationSalaryEntity = CalculationSalaryEntity.builder()
               .idEmployee(employee.getId())
-              .monthWork(lastDayOfMonth)
+              .accountEmployee(employee.getAccount())
+              .monthWork(lastMonth)
               .totalDaysLate(totalDaysLate)
               .totalDaysBackSoon(totalDaysBackSoon)
               .totalDaysRest(totalDaysRest)
               .totalDaysEnough(totalDaysEnough)
               .totalDaysOffPermission(0L)
+              .totalDaysOffNotPermission(totalDaysRest)
               .totalDaysOfMonth(totalDaysOfMonth)
               .workDays(dayWork)
               .totalSalaryOfMonth(calculationSalaryOfMonth(contractDetailEntity.getSalaryTotal(), dayWork, totalDaysOfMonth))
@@ -109,19 +112,21 @@ public class CalculationSalaryBatch extends BaseService {
             logCalculationSalary = LogCalculationSalaryEntity.builder()
                 .account(account)
                 .status(Boolean.TRUE)
-                .monthWork(lastDayOfMonth)
+                .monthWork(lastMonth)
                 .build();
           } else if (Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
             logCalculationSalary = LogCalculationSalaryEntity.builder()
                 .id(logCalculationSalaryEntity.getId())
                 .account(account)
                 .status(Boolean.TRUE)
-                .monthWork(lastDayOfMonth)
+                .monthWork(lastMonth)
                 .build();
           }
           logCalculationSalaryRepository.save(logCalculationSalary);
         }
       });
+
+      LOGGER.error("[Logger of calculation salary :] ------>   Success !" );
     } catch (Exception e) {
       LOGGER.error("[Exception of calculation salary :]" + e.getMessage());
       return;

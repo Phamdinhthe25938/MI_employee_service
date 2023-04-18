@@ -22,10 +22,8 @@ public class TimeScanDateDetailEntity extends BaseEntity {
   private Long id;
   @Column(name = "account_employee")
   private String accountEmployee;
-  @Column(name = "code_employee")
-  private String codeEmployee;
-  @Column(name = "uuid")
-  private String uuid;
+  @Column(name = "id_employee")
+  private Long idEmployee;
   @Column(name = "date_work")
   private LocalDate dateWork;
   @Column(name = "time_scan_in_start")

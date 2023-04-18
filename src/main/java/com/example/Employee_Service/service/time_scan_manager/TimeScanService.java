@@ -2,7 +2,7 @@ package com.example.Employee_Service.service.time_scan_manager;
 
 
 import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeScanRequest;
-import com.example.Employee_Service.model.dto.response.SearchTimeScanResponse;
+import com.example.Employee_Service.model.dto.response.time_scan_manager.SearchTimeScanResponse;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.model.entity.time_scan_manager.TimeScanEntity;
 import com.example.Employee_Service.repository.employee.EmployeeRepository;
@@ -49,7 +49,7 @@ public class TimeScanService extends BaseService {
     SearchTimeScanResponse response = SearchTimeScanResponse.builder().item(item).meta(meta).build();
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
-        SystemMessageCode.CommonMessage.SAVE_SUCCESS,
+        SystemMessageCode.CommonMessage.GET_SUCCESS,
         response
     );
   }
@@ -61,9 +61,8 @@ public class TimeScanService extends BaseService {
     employeeValidator.uuidIsValid(uuid, employee.getUuid());
     employeeValidator.accountIsValid(request.getAccount(), jwtService.getSubjectFromToken(jwtService.getTokenFromRequest(servletRequest)));
     TimeScanEntity timeScanEntity = TimeScanEntity.builder()
-        .codeEmployee(employee.getCode())
+        .idEmployee(employee.getId())
         .accountEmployee(employee.getAccount())
-        .uuid(uuid)
         .timeScan(request.getTimeScan())
         .typeScan(request.getTypeScan())
         .dayOfWeek(request.getTimeScan().getDayOfWeek().getValue())

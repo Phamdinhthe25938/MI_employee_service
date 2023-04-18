@@ -27,6 +27,9 @@ public class ContractDetailEntity extends BaseEntity {
   @Column(name = "id_employee")
   private Long idEmployee;
   @NotNull
+  @Column(name = "account_employee")
+  private String accountEmployee;
+  @NotNull
   @Column(name = "salary_basic")
   private Long salaryBasic;
   @Column(name = "salary_subsidize", columnDefinition = "json", nullable = false)

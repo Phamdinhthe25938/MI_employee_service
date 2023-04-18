@@ -1,4 +1,4 @@
-package com.example.Employee_Service.model.dto.response;
+package com.example.Employee_Service.model.dto.response.time_scan_manager;
 
 import com.example.Employee_Service.model.entity.time_scan_manager.TimeScanEntity;
 import com.obys.common.model.payload.response.MetaList;

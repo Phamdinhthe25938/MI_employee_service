@@ -2,6 +2,7 @@ package com.example.Employee_Service.service.employee;
 
 import com.example.Employee_Service.model.dto.request.employee.AddContractDetailRequest;
 import com.example.Employee_Service.model.entity.employee.ContractDetailEntity;
+import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.repository.employee.ContractDetailRepository;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,7 +35,7 @@ public class ContractDetailService extends BaseService {
   private ModelMapper modelMapper;
   public BaseResponse<?> save(AddContractDetailRequest request, BindingResult result) {
     hasError(result);
-    employeeValidator.employeeExist(request.getIdEmployee());
+    EmployeeEntity employee = employeeValidator.employeeExist(request.getIdEmployee());
     Long totalSalary = 0L;
     if (!ObjectUtils.isEmpty(request.getSalarySubsidize())) {
       ObjectNode salarySubsidize = request.getSalarySubsidize();
@@ -47,6 +48,7 @@ public class ContractDetailService extends BaseService {
     }
     totalSalary += request.getSalaryBasic();
     ContractDetailEntity contractDetailEntity = modelMapper.map(request, ContractDetailEntity.class);
+    contractDetailEntity.setAccountEmployee(employee.getAccount());
     contractDetailEntity.setSalaryTotal(totalSalary);
 
     ContractDetailEntity entity = contractDetailRepository.save(contractDetailEntity);

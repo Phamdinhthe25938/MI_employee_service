@@ -1,11 +1,10 @@
 package com.example.Employee_Service.config.jwt.fillter;
 
 import com.example.Employee_Service.config.jwt.en_code.Base64EnCode;
-import com.example.Employee_Service.model.dto.CustomUserDetails;
+import com.obys.common.model.CustomUserDetails;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.obys.common.constant.Constants;
-import com.obys.common.enums.RoleEnum;
 import com.obys.common.exception.ErrorV1Exception;
 import com.obys.common.model.payload.response.BaseResponse;
 import com.obys.common.system_message.SystemMessageCode;
@@ -27,9 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

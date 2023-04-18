@@ -18,19 +18,13 @@ public class TimeScanEntity extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
-
-  @Column(name = "code_employee")
-  private String codeEmployee;
-
+  @Column(name = "id_employee")
+  private Long idEmployee;
   @Column(name = "account_employee")
   private String accountEmployee;
-  @Column(name = "uuid")
-  private String uuid;
-
   @Column(name = "time_scan")
   @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
   private LocalDateTime timeScan;
-
   @Column(name = "type_scan")
   private Integer typeScan;
 

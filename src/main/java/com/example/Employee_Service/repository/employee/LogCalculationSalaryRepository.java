@@ -5,11 +5,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Optional;
 
 @Repository("LogCalculationSalaryRepository")
 public interface LogCalculationSalaryRepository extends CrudRepository<LogCalculationSalaryEntity, Long> {
 
 
-  Optional<LogCalculationSalaryEntity> findByAccountAndMonthWork(String account, LocalDate monthWork);
+  Optional<LogCalculationSalaryEntity> findByAccountAndMonthWork(String account, YearMonth monthWork);
 }

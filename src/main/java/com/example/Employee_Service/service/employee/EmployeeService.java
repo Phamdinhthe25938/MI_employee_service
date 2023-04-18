@@ -63,7 +63,7 @@ public class EmployeeService extends BaseService {
   public BaseResponse<?> save(AddEmployeeRequest request, BindingResult result, HttpServletRequest httpServlet) {
     hasError(result);
     employeeValidator.validateSaveEmployee(request);
-    PositionEntity positionEntity = employeeValidator.checkPositionExist(request.getPositionId());
+    employeeValidator.checkPositionExist(request.getPositionId());
     EmployeeEntity employeeEntity = modelMapper.map(request, EmployeeEntity.class);
     String account = buildAccount(request.getFullName());
     String code = buildCode();

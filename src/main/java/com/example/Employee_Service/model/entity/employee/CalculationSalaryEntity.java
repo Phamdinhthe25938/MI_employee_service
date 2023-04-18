@@ -1,11 +1,15 @@
 package com.example.Employee_Service.model.entity.employee;
 
 import com.obys.common.model.entity.BaseEntity;
+import com.vladmihalcea.hibernate.type.basic.YearMonthTimestampType;
 import lombok.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Data
 @Entity
@@ -14,6 +18,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "calculation_salary")
+@TypeDef(name = "yearMonth", typeClass = YearMonth.class)
 public class CalculationSalaryEntity extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +28,12 @@ public class CalculationSalaryEntity extends BaseEntity {
   @Column(name = "id_employee")
   private Long idEmployee;
   @NotNull
+  @Column(name = "account_employee")
+  private String accountEmployee;
+  @NotNull
   @Column(name = "month_work")
-  private LocalDate monthWork;
+  @Type(type = "yearMonth")
+  private YearMonth monthWork;
   @NotNull
   @Column(name = "total_days_late")
   private Long totalDaysLate = 0L;
@@ -43,6 +52,9 @@ public class CalculationSalaryEntity extends BaseEntity {
   @NotNull
   @Column(name = "total_days_off_permission")
   private Long totalDaysOffPermission;
+  @NotNull
+  @Column(name = "total_days_off_not_permission")
+  private Long totalDaysOffNotPermission;
   @NotNull
   @Column(name = "total_days_of_month")
   private Long totalDaysOfMonth;

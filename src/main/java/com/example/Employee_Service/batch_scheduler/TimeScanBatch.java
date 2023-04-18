@@ -85,11 +85,11 @@ public class TimeScanBatch {
             int statusWorkday;
             LocalTime localTimeMax = timeScanOutEnd.getTimeScan().toLocalTime();
             LocalTime localTimeMin = timeScanInStart.getTimeScan().toLocalTime();
-            if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME) && localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME)) {
+            if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME_DAY) && localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME_DAY)) {
               statusWorkday = StatusWorkdayEnum.LATE_BACK_SOON.getCode();
-            } else if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME)) {
+            } else if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME_DAY)) {
               statusWorkday = StatusWorkdayEnum.BACK_SOON.getCode();
-            } else if (localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME)) {
+            } else if (localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME_DAY)) {
               statusWorkday = StatusWorkdayEnum.LATE.getCode();
             } else {
               statusWorkday = StatusWorkdayEnum.ENOUGH.getCode();
@@ -144,8 +144,7 @@ public class TimeScanBatch {
   private TimeScanDateDetailEntity buildTimeScanDetailObject(EmployeeEntity employee, LocalDate dateWork, LocalDateTime timeScanInStart, LocalDateTime timeScanOutEnd, Long timeReality, Integer statusScanWorkDay, Integer statusWorkDay, Double numberWorkday) {
     return TimeScanDateDetailEntity.builder()
         .accountEmployee(employee.getAccount())
-        .codeEmployee(employee.getCode())
-        .uuid(employee.getUuid())
+        .idEmployee(employee.getId())
         .dateWork(dateWork)
         .timeScanInStart(timeScanInStart)
         .timeScanOutEnd(timeScanOutEnd)
