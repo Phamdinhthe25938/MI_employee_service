@@ -46,7 +46,7 @@ public class CalculationSalaryBatch extends BaseService {
   @Qualifier("LogCalculationSalaryRepository")
   private LogCalculationSalaryRepository logCalculationSalaryRepository;
 
-  @Scheduled(cron = "10 * * * * *")
+//  @Scheduled(cron = "10 * * * * *")
   public void calculationSalary() {
     try {
       YearMonth currentMonth = YearMonth.now();

@@ -57,7 +57,7 @@ public class TimeScanBatch {
   @Resource
   private TaskScheduler taskScheduler;
 
-  @Scheduled(cron = "${time.scan.scheduler}")
+//  @Scheduled(cron = "${time.scan.scheduler}")
   @Transactional(rollbackFor = Exception.class)
   public void timeScanBatch() {
     List<String> allAccount = employeeRepository.getAllAccountName(StatusEmployeeEnum.WORKING.getCode());
@@ -134,7 +134,7 @@ public class TimeScanBatch {
     });
   }
 
-  @Scheduled(cron = "10 * * * * *")
+//  @Scheduled(cron = "10 * * * * *")
   public void changeCron() {
     CronTrigger cronTrigger = new CronTrigger("15 * * * * *");
     taskScheduler.schedule(this::timeScanBatch, cronTrigger);

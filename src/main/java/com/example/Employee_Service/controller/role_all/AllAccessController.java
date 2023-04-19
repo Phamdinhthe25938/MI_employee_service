@@ -1,15 +1,19 @@
 package com.example.Employee_Service.controller.role_all;
 
 import com.example.Employee_Service.model.dto.request.employee.AddLogVacationDayRequest;
+import com.example.Employee_Service.model.dto.request.employee.AddNotificationRequest;
 import com.example.Employee_Service.model.dto.request.employee.UpdateLogVacationDayRequest;
 import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeScanRequest;
 import com.example.Employee_Service.model.dto.request.time_scan_manager.GetListTimeScanDetailRequest;
 import com.example.Employee_Service.service.employee.LogVacationDayService;
+import com.example.Employee_Service.service.employee.NotificationService;
 import com.example.Employee_Service.service.time_scan_manager.TimeScanDetailService;
 import com.example.Employee_Service.service.time_scan_manager.TimeScanService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +28,15 @@ public class AllAccessController {
   @Resource
   @Qualifier("TimeScanService")
   TimeScanService timeScanService;
-
   @Resource
   @Qualifier("TimeScanDetailService")
   private TimeScanDetailService timeScanDetailService;
   @Resource
   @Qualifier("LogVacationDayService")
   private LogVacationDayService logVacationDayService;
+  @Resource
+  @Qualifier("NotificationService")
+  private NotificationService notificationService;
 
   @GetMapping("/time-scan/getAll")
   public ResponseEntity<?> getAll() {
@@ -54,5 +60,12 @@ public class AllAccessController {
   @PutMapping("/log-vacation/update")
   public ResponseEntity<?> updateLogVacation(@Valid @RequestBody UpdateLogVacationDayRequest request) {
     return new ResponseEntity<>(logVacationDayService.update(request), HttpStatus.OK);
+  }
+  /**
+   * Notification real time
+   */
+  @MessageMapping("/notification")
+  public ResponseEntity<?> sendNotification(@Payload AddNotificationRequest request) {
+    return new ResponseEntity<>(notificationService.save(request), HttpStatus.OK);
   }
 }
