@@ -20,11 +20,13 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Resource;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @Component
@@ -37,12 +39,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private Base64EnCode base64EnCode;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+  protected void doFilterInternal(@Nonnull HttpServletRequest request,@Nonnull HttpServletResponse response,@Nonnull FilterChain chain) throws ServletException, IOException {
      try {
        String base64 = request.getHeader("En_code");
        String codeDecrypt = base64EnCode.decrypt(base64);
        String userName;
-       if (request.getRequestURI().contains("notifications")) {
+       if (request.getRequestURI().contains("notification")) {
          codeDecrypt = "hello";
        }
        if (codeDecrypt != null) {
@@ -62,6 +64,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                LOGGER.info("URI -----> " + request.getRequestURI());
                jwtService.checkRole(request.getRequestURI(), roles);
              }
+             response.setHeader("Access-Control-Allow-Origin", "*");
+             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+             response.setHeader("Access-Control-Max-Age", "3600");
+             response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept, X-Requested-With, remember-me");
            } else {
              LOGGER.error("[JwtAuthenticationFilter][doFilterInternal] Token is invalid !");
              throw new ErrorV1Exception(messageExceptionFilter(
@@ -76,7 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
        String[] messages = e.getMessage().split("<-->");
        errorResponse.setCode(messages[0]);
        errorResponse.setMessage(jwtService.getMessage(messages[1]));
-
+       LOGGER.error("[JwtAuthenticationFilter][doFilterInternal] Token is exception ---> !");
        ResponseEntity<BaseResponse<?>> responseEntity = new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
        response.getWriter().write(new ObjectMapper().writeValueAsString(responseEntity.getBody()));

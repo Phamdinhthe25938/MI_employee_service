@@ -25,12 +25,9 @@ public class NotificationService extends BaseService {
   @Resource
   private SimpMessagingTemplate simpMessagingTemplate;
 
-  public BaseResponse<?> save(AddNotificationRequest request) {
+  public void save(AddNotificationRequest request) {
     NotificationEntity entity = modelMapper.map(request, NotificationEntity.class);
-    simpMessagingTemplate.convertAndSend("/topic/notification/" + request.getIdReceived());
+    simpMessagingTemplate.convertAndSend("/topic/notification/" + request.getIdReceived(), request);
     notificationRepository.save(entity);
-    return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
-        SystemMessageCode.CommonMessage.SAVE_SUCCESS,
-        entity);
   }
 }

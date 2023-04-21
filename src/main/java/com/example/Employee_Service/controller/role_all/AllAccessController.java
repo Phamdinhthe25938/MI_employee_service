@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin
-@RequestMapping("/api/all/")
+@CrossOrigin(origins = "http://localhost:1010")
+@RequestMapping("/api/all")
 public class AllAccessController {
   @Resource
   @Qualifier("TimeScanService")
@@ -64,8 +64,9 @@ public class AllAccessController {
   /**
    * Notification real time
    */
-  @MessageMapping("/notification")
+  @MessageMapping("/test")
   public ResponseEntity<?> sendNotification(@Payload AddNotificationRequest request) {
-    return new ResponseEntity<>(notificationService.save(request), HttpStatus.OK);
+    notificationService.save(request);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

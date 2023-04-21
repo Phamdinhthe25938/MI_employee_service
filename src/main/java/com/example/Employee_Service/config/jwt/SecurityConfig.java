@@ -32,13 +32,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authorizeRequests().antMatchers("/api/**").permitAll()
-//                .and().authorizeRequests().antMatchers("/hello").hasRole("USER")
-        .and().authorizeRequests().anyRequest().authenticated()
-        .and().csrf().disable();
-    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .exceptionHandling();
-    http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
+//    System.out.println("Http : ---> " + http.toString());
+//    http.authorizeRequests().antMatchers("http://localhost:8002/employee-service/notification").permitAll()
+////                .and().authorizeRequests().antMatchers("/hello").hasRole("USER")
+//        .and().authorizeRequests().anyRequest().authenticated()
+//        .and().csrf().disable();
+//    http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//        .exceptionHandling();
+//    http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues());
   }
 
 //     xắc thực
