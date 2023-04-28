@@ -6,9 +6,9 @@ import com.example.Employee_Service.model.dto.response.time_scan_manager.GetTime
 import com.example.Employee_Service.model.entity.time_scan_manager.TimeScanDateDetailEntity;
 import com.example.Employee_Service.repository.time_scan_manager.TimeScanDateDetailRepository;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
-import com.obys.common.model.payload.response.BaseResponse;
-import com.obys.common.service.BaseService;
-import com.obys.common.system_message.SystemMessageCode;
+import com.the.common.model.payload.response.BaseResponse;
+import com.the.common.service.BaseService;
+import com.the.common.system_message.SystemMessageCode;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

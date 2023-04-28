@@ -2,7 +2,7 @@ package com.example.Employee_Service.model.entity.employee;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.obys.common.model.entity.BaseEntity;
+import com.the.common.model.entity.BaseEntity;
 import lombok.*;
 import org.checkerframework.common.aliasing.qual.Unique;
 import org.hibernate.validator.constraints.Length;

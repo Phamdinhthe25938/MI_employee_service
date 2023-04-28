@@ -1,6 +1,6 @@
 package com.example.Employee_Service.config.auditor;
 
-import com.obys.common.model.CustomUserDetails;
+import com.the.common.model.CustomUserDetails;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.context.SecurityContextHolder;
 

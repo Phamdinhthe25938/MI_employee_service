@@ -1,7 +1,6 @@
 package com.example.Employee_Service.model.entity.time_scan_manager;
 
-import com.obys.common.model.entity.BaseEntity;
-import com.obys.common.service.BaseService;
+import com.the.common.model.entity.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;

@@ -1,13 +1,13 @@
 package com.example.Employee_Service.config.jwt.fillter;
 
 import com.example.Employee_Service.config.jwt.en_code.Base64EnCode;
-import com.obys.common.model.CustomUserDetails;
+import com.the.common.model.CustomUserDetails;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.obys.common.constant.Constants;
-import com.obys.common.exception.ErrorV1Exception;
-import com.obys.common.model.payload.response.BaseResponse;
-import com.obys.common.system_message.SystemMessageCode;
+import com.the.common.constant.Constants;
+import com.the.common.exception.ErrorV1Exception;
+import com.the.common.model.payload.response.BaseResponse;
+import com.the.common.system_message.SystemMessageCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @Component

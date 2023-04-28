@@ -1,13 +1,12 @@
 package com.example.Employee_Service.model.entity.employee;
 
-import com.obys.common.model.entity.BaseEntity;
+import com.the.common.model.entity.BaseEntity;
 import com.vladmihalcea.hibernate.type.basic.YearMonthTimestampType;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Data

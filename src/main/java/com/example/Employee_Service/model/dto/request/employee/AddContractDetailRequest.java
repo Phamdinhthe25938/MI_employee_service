@@ -1,7 +1,7 @@
 package com.example.Employee_Service.model.dto.request.employee;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.obys.common.validator.annotation.Required;
+import com.the.common.validator.annotation.Required;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

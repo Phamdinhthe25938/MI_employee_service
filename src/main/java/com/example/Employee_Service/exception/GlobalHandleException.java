@@ -1,17 +1,15 @@
 package com.example.Employee_Service.exception;
 
-import com.obys.common.exception.ErrorV1Exception;
-import com.obys.common.exception.ErrorV2Exception;
-import com.obys.common.exception.HasErrorException;
-import com.obys.common.service.BaseService;
+import com.the.common.exception.ErrorV1Exception;
+import com.the.common.exception.ErrorV2Exception;
+import com.the.common.exception.ExceptionCommon;
+import com.the.common.exception.HasErrorException;
+import com.the.common.service.BaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import javax.annotation.Resource;
 
 /**
  * The type Handler exception.
@@ -47,5 +45,8 @@ public class GlobalHandleException extends BaseService {
     return ResponseEntity.ok(responseV2(code, message, null));
   }
 
-
+  @ExceptionHandler(ExceptionCommon.class)
+  public ResponseEntity<?> handleErrorExceptionCommon(ExceptionCommon e) {
+    return ResponseEntity.ok(responseV2("Code_exception_common", e.getMessage(), null));
+  }
 }

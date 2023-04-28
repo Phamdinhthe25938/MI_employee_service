@@ -1,7 +1,7 @@
 package com.example.Employee_Service.service.jwt;
 
-import com.obys.common.constant.Constants;
-import com.obys.common.service.BaseService;
+import com.the.common.constant.Constants;
+import com.the.common.service.BaseService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,6 @@ import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.List;
 import java.util.function.Function;
 
 @Service("JWTService")
@@ -27,6 +26,12 @@ public class JWTService extends BaseService {
     String authHeader = request.getHeader(Constants.AuthService.AUTHORIZATION);
     if (authHeader != null && authHeader.startsWith(Constants.AuthService.BEARER)) {
       return authHeader.replace(Constants.AuthService.BEARER, "");
+    }
+    return null;
+  }
+  public String getTokenFromAuthor(String authorization) {
+    if (authorization != null && authorization.startsWith(Constants.AuthService.BEARER)) {
+      return authorization.replace(Constants.AuthService.BEARER, "");
     }
     return null;
   }

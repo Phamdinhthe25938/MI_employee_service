@@ -1,6 +1,6 @@
 package com.example.Employee_Service.model.entity.employee;
 
-import com.obys.common.model.entity.BaseEntity;
+import com.the.common.model.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +29,9 @@ public class LogVacationDayEntity extends BaseEntity {
   @NotNull
   @Column(name = "account_employee")
   private String accountEmployee;
+  @NotNull
+  @Column(name = "uuid_employee")
+  private String uuidEmployee;
   @NotNull
   @Column(name = "id_assign")
   private Long idAssign;

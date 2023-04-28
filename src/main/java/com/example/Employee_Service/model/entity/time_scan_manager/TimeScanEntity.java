@@ -1,7 +1,7 @@
 package com.example.Employee_Service.model.entity.time_scan_manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.obys.common.model.entity.BaseEntity;
+import com.the.common.model.entity.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;

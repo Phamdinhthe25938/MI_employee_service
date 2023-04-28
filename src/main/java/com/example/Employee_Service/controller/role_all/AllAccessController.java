@@ -9,6 +9,7 @@ import com.example.Employee_Service.service.employee.LogVacationDayService;
 import com.example.Employee_Service.service.employee.NotificationService;
 import com.example.Employee_Service.service.time_scan_manager.TimeScanDetailService;
 import com.example.Employee_Service.service.time_scan_manager.TimeScanService;
+import com.the.common.constant.Constants;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.socket.WebSocketSession;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -65,8 +67,9 @@ public class AllAccessController {
    * Notification real time
    */
   @MessageMapping("/test")
-  public ResponseEntity<?> sendNotification(@Payload AddNotificationRequest request) {
-    notificationService.save(request);
+  public ResponseEntity<?> sendNotification(@Payload AddNotificationRequest request, WebSocketSession session) {
+    String authorization = session.getHandshakeHeaders().getFirst(Constants.AuthService.AUTHORIZATION);
+    notificationService.save(request, authorization);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

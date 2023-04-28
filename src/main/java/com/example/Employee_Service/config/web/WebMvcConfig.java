@@ -2,15 +2,15 @@ package com.example.Employee_Service.config.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.obys.common.config.i18n.SmartLocaleResolver;
-import com.obys.common.validator.regex.RegexHelper;
+import com.the.common.config.i18n.SmartLocaleResolver;
+import com.the.common.validator.regex.RegexHelper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -87,6 +87,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
   @Bean(name = "RegexHelper")
   public RegexHelper getRegexHelper() {
     return new RegexHelper();
+  }
+
+  /**
+   * Bean multithreading
+   */
+  @Bean(name = "threadPoolExecutor")
+  public ThreadPoolTaskExecutor executorTask() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(4);
+    executor.setMaxPoolSize(5);
+    executor.setThreadNamePrefix("executor-");
+    executor.initialize();
+    return executor;
   }
 }
 

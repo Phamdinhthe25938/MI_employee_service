@@ -1,6 +1,6 @@
 package com.example.Employee_Service.model.entity.employee;
 
-import com.obys.common.model.entity.BaseEntity;
+import com.the.common.model.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

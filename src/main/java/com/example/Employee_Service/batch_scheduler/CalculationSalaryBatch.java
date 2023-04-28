@@ -13,10 +13,10 @@ import com.example.Employee_Service.repository.employee.LogCalculationSalaryRepo
 import com.example.Employee_Service.repository.time_scan_manager.TimeScanDateDetailRepository;
 import com.example.Employee_Service.validate.contract.ContractDetailValidator;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
-import com.obys.common.enums.DaysOfWeekEnum;
-import com.obys.common.service.BaseService;
+import com.the.common.enums.DaysOfWeekEnum;
+import com.the.common.service.BaseService;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -45,6 +45,8 @@ public class CalculationSalaryBatch extends BaseService {
   @Resource
   @Qualifier("LogCalculationSalaryRepository")
   private LogCalculationSalaryRepository logCalculationSalaryRepository;
+  @Resource(name = "threadPoolExecutor")
+  private ThreadPoolTaskExecutor executor;
 
 //  @Scheduled(cron = "10 * * * * *")
   public void calculationSalary() {
@@ -62,68 +64,70 @@ public class CalculationSalaryBatch extends BaseService {
       List<TimeScanDateDetailEntity> timeScanDateDetailByMonth = timeScanDateDetailRepository.getAllByMonth(firstDayOfMonth, lastDayOfMonth);
 
       allAccount.forEach(account -> {
-        LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccountAndMonthWork(account, lastMonth).orElse(null);
-        if (logCalculationSalaryEntity == null || Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
+        executor.execute(() -> {
+          LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccountAndMonthWork(account, lastMonth).orElse(null);
+          if (logCalculationSalaryEntity == null || Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
 
-          EmployeeEntity employee = employeeValidator.accountEmployeeExist(account);
-          ContractDetailEntity contractDetailEntity = contractDetailValidator.checkEmployeeExist(employee.getId());
-          Long totalDaysOfMonth = calculationDayMonth(lastMonth.getMonth().getValue(), lastMonth.getYear());
+            EmployeeEntity employee = employeeValidator.accountEmployeeExist(account);
+            ContractDetailEntity contractDetailEntity = contractDetailValidator.checkEmployeeExist(employee.getId());
+            Long totalDaysOfMonth = calculationDayMonth(lastMonth.getMonth().getValue(), lastMonth.getYear());
 
-          // Get list time scan by month and year of account
-          List<TimeScanDateDetailEntity> timeScanDateDetailByMonthOfAccount = timeScanDateDetailByMonth.
-              stream().filter(e -> e.getAccountEmployee().equals(account)
-                  && !e.getDayOfWeek().equals(DaysOfWeekEnum.SATURDAY.getCode())
-                  && !e.getDayOfWeek().equals(DaysOfWeekEnum.SUNDAY.getCode())).collect(Collectors.toList());
+            // Get list time scan by month and year of account
+            List<TimeScanDateDetailEntity> timeScanDateDetailByMonthOfAccount = timeScanDateDetailByMonth.
+                stream().filter(e -> e.getAccountEmployee().equals(account)
+                    && !e.getDayOfWeek().equals(DaysOfWeekEnum.SATURDAY.getCode())
+                    && !e.getDayOfWeek().equals(DaysOfWeekEnum.SUNDAY.getCode())).collect(Collectors.toList());
 
-          Long totalDaysEnough = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.ENOUGH.getCode())).count();
+            Long totalDaysEnough = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.ENOUGH.getCode())).count();
 
-          Long totalDaysLate = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.LATE.getCode())).count();
+            Long totalDaysLate = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.LATE.getCode())).count();
 
-          Long totalDaysBackSoon = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.BACK_SOON.getCode())).count();
+            Long totalDaysBackSoon = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.BACK_SOON.getCode())).count();
 
-          Long totalDaysRest = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.REST.getCode())).count();
-          // count total day work go late and back soon
-          long totalDayGoLateAndBackSoon = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.LATE_BACK_SOON.getCode())).count();
+            Long totalDaysRest = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.REST.getCode())).count();
+            // count total day work go late and back soon
+            long totalDayGoLateAndBackSoon = timeScanDateDetailByMonthOfAccount.stream().filter(e -> e.getStatusWorkdays().equals(StatusWorkdayEnum.LATE_BACK_SOON.getCode())).count();
 
-          // total work day of account =
-          Double dayWork = timeScanDateDetailByMonthOfAccount.stream().mapToDouble(TimeScanDateDetailEntity::getNumberWorkday).sum();
-          for (int i = 0; i < totalDayGoLateAndBackSoon; i++) {
-            totalDaysLate++;
-            totalDaysBackSoon++;
-          }
-          CalculationSalaryEntity calculationSalaryEntity = CalculationSalaryEntity.builder()
-              .idEmployee(employee.getId())
-              .accountEmployee(employee.getAccount())
-              .monthWork(lastMonth)
-              .totalDaysLate(totalDaysLate)
-              .totalDaysBackSoon(totalDaysBackSoon)
-              .totalDaysRest(totalDaysRest)
-              .totalDaysEnough(totalDaysEnough)
-              .totalDaysOffPermission(0L)
-              .totalDaysOffNotPermission(totalDaysRest)
-              .totalDaysOfMonth(totalDaysOfMonth)
-              .workDays(dayWork)
-              .totalSalaryOfMonth(calculationSalaryOfMonth(contractDetailEntity.getSalaryTotal(), dayWork, totalDaysOfMonth))
-              .build();
-          calculationSalaryRepository.save(calculationSalaryEntity);
-          // save log calculation salary account
-          LogCalculationSalaryEntity logCalculationSalary = new LogCalculationSalaryEntity();
-          if (logCalculationSalaryEntity == null) {
-            logCalculationSalary = LogCalculationSalaryEntity.builder()
-                .account(account)
-                .status(Boolean.TRUE)
+            // total work day of account =
+            Double dayWork = timeScanDateDetailByMonthOfAccount.stream().mapToDouble(TimeScanDateDetailEntity::getNumberWorkday).sum();
+            for (int i = 0; i < totalDayGoLateAndBackSoon; i++) {
+              totalDaysLate++;
+              totalDaysBackSoon++;
+            }
+            CalculationSalaryEntity calculationSalaryEntity = CalculationSalaryEntity.builder()
+                .idEmployee(employee.getId())
+                .accountEmployee(employee.getAccount())
                 .monthWork(lastMonth)
+                .totalDaysLate(totalDaysLate)
+                .totalDaysBackSoon(totalDaysBackSoon)
+                .totalDaysRest(totalDaysRest)
+                .totalDaysEnough(totalDaysEnough)
+                .totalDaysOffPermission(0L)
+                .totalDaysOffNotPermission(totalDaysRest)
+                .totalDaysOfMonth(totalDaysOfMonth)
+                .workDays(dayWork)
+                .totalSalaryOfMonth(calculationSalaryOfMonth(contractDetailEntity.getSalaryTotal(), dayWork, totalDaysOfMonth))
                 .build();
-          } else if (Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
-            logCalculationSalary = LogCalculationSalaryEntity.builder()
-                .id(logCalculationSalaryEntity.getId())
-                .account(account)
-                .status(Boolean.TRUE)
-                .monthWork(lastMonth)
-                .build();
+            calculationSalaryRepository.save(calculationSalaryEntity);
+            // save log calculation salary account
+            LogCalculationSalaryEntity logCalculationSalary = new LogCalculationSalaryEntity();
+            if (logCalculationSalaryEntity == null) {
+              logCalculationSalary = LogCalculationSalaryEntity.builder()
+                  .account(account)
+                  .status(Boolean.TRUE)
+                  .monthWork(lastMonth)
+                  .build();
+            } else if (Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
+              logCalculationSalary = LogCalculationSalaryEntity.builder()
+                  .id(logCalculationSalaryEntity.getId())
+                  .account(account)
+                  .status(Boolean.TRUE)
+                  .monthWork(lastMonth)
+                  .build();
+            }
+            logCalculationSalaryRepository.save(logCalculationSalary);
           }
-          logCalculationSalaryRepository.save(logCalculationSalary);
-        }
+        });
       });
 
       LOGGER.error("[Logger of calculation salary :] ------>   Success !" );

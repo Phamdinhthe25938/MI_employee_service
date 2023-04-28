@@ -1,6 +1,6 @@
 package com.example.Employee_Service.model.dto.request.employee;
 
-import com.obys.common.validator.annotation.Required;
+import com.the.common.validator.annotation.Required;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +15,5 @@ public class AddNotificationRequest {
   private Long idReceived;
 
   @Required(message = "{type.send.is.required}")
-  private Long typeSend;
+  private Integer typeNotification;
 }

@@ -1,6 +1,6 @@
 package com.example.Employee_Service.model.entity.employee;
 
-import com.obys.common.model.entity.BaseEntity;
+import com.the.common.model.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,14 +31,17 @@ public class NotificationEntity extends BaseEntity {
   private Long idReceived;
   @NotNull
   @Column(name = "account_received")
-  private Long accountReceived;
+  private String accountReceived;
   @NotNull
   @Column(name = "uuid_received")
   private String uuidReceived;
+  @NotNull
+  @Column(name = "type_notification")
+  private Integer typeNotification;
   @NotNull
   @Column(name = "title")
   private String title;
   @NotNull
   @Column(name = "content")
-  private Long content;
+  private String content;
 }

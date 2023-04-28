@@ -1,30 +1,34 @@
 package com.example.Employee_Service.service.employee;
 
 import com.example.Employee_Service.enums.TypeLogVacationDayEnum;
+import com.example.Employee_Service.model.dto.request.employee.DeleteLogVacationRequest;
+import com.example.Employee_Service.model.dto.request.employee.GetListLogVacationByPersonSend;
 import com.example.Employee_Service.model.dto.request.employee.UpdateLogVacationDayRequest;
-import com.example.Employee_Service.repository.employee.NotificationRepository;
-import com.obys.common.exception.ErrorV2Exception;
-import com.obys.common.model.CustomUserDetails;
+import com.example.Employee_Service.model.dto.response.employee.GetListVacationResponse;
+import com.example.Employee_Service.service.jwt.JWTService;
+import com.the.common.exception.ErrorV2Exception;
 import com.example.Employee_Service.model.dto.request.employee.AddLogVacationDayRequest;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.model.entity.employee.LogVacationDayEntity;
 import com.example.Employee_Service.repository.employee.LogVacationDayRepository;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
-import com.obys.common.constant.Constants;
-import com.obys.common.enums.PositionEnum;
-import com.obys.common.exception.ErrorV1Exception;
-import com.obys.common.model.payload.response.BaseResponse;
-import com.obys.common.service.BaseService;
-import com.obys.common.system_message.SystemMessageCode;
+import com.the.common.constant.Constants;
+import com.the.common.enums.PositionEnum;
+import com.the.common.exception.ErrorV1Exception;
+import com.the.common.model.payload.response.BaseResponse;
+import com.the.common.model.payload.response.MetaList;
+import com.the.common.service.BaseService;
+import com.the.common.system_message.SystemMessageCode;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,9 +36,6 @@ import java.util.List;
 
 @Service("LogVacationDayService")
 public class LogVacationDayService extends BaseService {
-
-  @Resource
-  private SimpMessagingTemplate simpMessagingTemplate;
   @Resource
   @Qualifier("LogVacationDayRepository")
   private LogVacationDayRepository logVacationDayRepository;
@@ -44,16 +45,13 @@ public class LogVacationDayService extends BaseService {
   @Resource
   @Qualifier("EmployeeValidator")
   private EmployeeValidator employeeValidator;
-  @Resource
-  @Qualifier("NotificationRepository")
-  private NotificationRepository notificationRepository;
-
+  @Resource(name = "JWTService")
+  private JWTService jwtService;
   /**
    * save log vacation
    * @param request : "AddLogVacationDayRequest.class"
    * @return base response
    */
-
   @Transactional(rollbackFor = Exception.class)
   public BaseResponse<?> save(AddLogVacationDayRequest request) {
 
@@ -66,13 +64,13 @@ public class LogVacationDayService extends BaseService {
 
     logVacationDay.setIdEmployee(employeeLog.getId());
     logVacationDay.setAccountEmployee(employeeLog.getAccount());
+    logVacationDay.setUuidEmployee(employeeLog.getUuid());
     logVacationDay.setAccountAssign(employeeAssign.getAccount());
     logVacationDay.setStatusApprove(Boolean.FALSE);
     logVacationDay.setTimeLogStart(timeLog(request.getTypeDayLog(), request.getDateLogVacation()).get(0));
     logVacationDay.setTimeLogEnd(timeLog(request.getTypeDayLog(), request.getDateLogVacation()).get(1));
 
     LogVacationDayEntity entity = logVacationDayRepository.save(logVacationDay);
-    // send notification real time;
 
     return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,
@@ -80,8 +78,11 @@ public class LogVacationDayService extends BaseService {
   }
 
   public BaseResponse<?> update(UpdateLogVacationDayRequest request) {
-    checkLogExist(request.getId());
-
+    LogVacationDayEntity logVacationDayEntity = checkLogExist(request.getId());
+    if (Boolean.FALSE.equals(logVacationDayEntity.getStatusApprove())) {
+      throw new ErrorV1Exception(messageV1Exception(SystemMessageCode.EmployeeService.CODE_STATUS_APPROVE_INVALID,
+          SystemMessageCode.EmployeeService.MESSAGE_DELETE_LOG_VACATION_INVALID));
+    }
     EmployeeEntity employeeLog = employeeValidator.accountEmployeeExist(getCustomUserDetail().getUsername());
     EmployeeEntity employeeAssign = employeeValidator.employeeExist(request.getIdAssign());
     checkPositionIdAssign(employeeAssign.getPositionId());
@@ -89,6 +90,7 @@ public class LogVacationDayService extends BaseService {
 
     logVacationDay.setIdEmployee(employeeLog.getId());
     logVacationDay.setAccountEmployee(employeeLog.getAccount());
+    logVacationDay.setUuidEmployee(employeeLog.getUuid());
     logVacationDay.setAccountAssign(employeeAssign.getAccount());
     logVacationDay.setStatusApprove(Boolean.FALSE);
     logVacationDay.setTimeLogStart(timeLog(request.getTypeDayLog(), request.getDateLogVacation()).get(0));
@@ -96,10 +98,55 @@ public class LogVacationDayService extends BaseService {
 
     LogVacationDayEntity entity = logVacationDayRepository.save(logVacationDay);
     return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
-        SystemMessageCode.CommonMessage.SAVE_SUCCESS,
+        SystemMessageCode.CommonMessage.UPDATE_SUCCESS,
         entity);
   }
 
+  public BaseResponse<?> delete(DeleteLogVacationRequest request, HttpServletRequest httpServletRequest){
+    LogVacationDayEntity entity = checkLogExist(request.getId());
+    String uuid = getUUID(httpServletRequest);
+    if (Boolean.FALSE.equals(entity.getStatusApprove())) {
+      throw new ErrorV1Exception(messageV1Exception(SystemMessageCode.EmployeeService.CODE_STATUS_APPROVE_INVALID,
+          SystemMessageCode.EmployeeService.MESSAGE_DELETE_LOG_VACATION_INVALID));
+    }
+    logVacationDayRepository.deleteByIdAndUuidEmployee(request.getId(), uuid);
+    return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS, SystemMessageCode.CommonMessage.DELETE_SUCCESS, null);
+  }
+
+  /**
+   *
+   * @param request : GetListLogVacationByPersonSend
+   * @param httpServletRequest : HttpServletRequest
+   */
+  public BaseResponse<?> getByPersonSend(GetListLogVacationByPersonSend request, HttpServletRequest httpServletRequest) {
+    Pageable pageable = buildPageable(request.getMeta());
+    EmployeeEntity employee = employeeValidator.accountEmployeeExist(jwtService.getSubjectFromToken(jwtService.getTokenFromRequest(httpServletRequest)));
+    Page<LogVacationDayEntity> values = logVacationDayRepository.getAllByIdEmployeeAndUuidEmployee(employee.getId(), getUUID(httpServletRequest), pageable);
+    Long total = values.getTotalElements();
+    MetaList metaList = buildMetaList(pageable, total);
+    return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
+        SystemMessageCode.CommonMessage.GET_SUCCESS,
+        new GetListVacationResponse(values.getContent(), metaList)
+    );
+  }
+
+  /**
+   *
+   * @param request : GetListLogVacationByPersonSend
+   * @param httpServletRequest : HttpServletRequest
+   * @return list log vacation by id assign
+   */
+  public BaseResponse<?> getByAssign(GetListLogVacationByPersonSend request, HttpServletRequest httpServletRequest) {
+    Pageable pageable = buildPageable(request.getMeta());
+    EmployeeEntity employee = employeeValidator.accountEmployeeExist(jwtService.getSubjectFromToken(jwtService.getTokenFromRequest(httpServletRequest)));
+    Page<LogVacationDayEntity> values = logVacationDayRepository.getAllByIdAssign(employee.getId(), pageable);
+    Long total = values.getTotalElements();
+    MetaList metaList = buildMetaList(pageable, total);
+    return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
+        SystemMessageCode.CommonMessage.GET_SUCCESS,
+        new GetListVacationResponse(values.getContent(), metaList)
+    );
+  }
   /**
    *
    * @param position : is id of post personal entrusted
@@ -137,7 +184,7 @@ public class LogVacationDayService extends BaseService {
   /**
    * validate element log vacation exist
    */
-  public void checkLogExist(Long id) {
+  public LogVacationDayEntity checkLogExist(Long id) {
     LogVacationDayEntity entity = logVacationDayRepository.findById(id).orElse(null);
     if (ObjectUtils.isEmpty(entity)) {
       throw new ErrorV2Exception(messageV2Exception(
@@ -146,5 +193,6 @@ public class LogVacationDayService extends BaseService {
           SystemMessageCode.CommonMessage.NOT_EXIST_IN_SYSTEM
       ));
     }
+    return entity;
   }
 }
