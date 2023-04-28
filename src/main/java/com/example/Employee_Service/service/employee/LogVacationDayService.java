@@ -1,13 +1,10 @@
 package com.example.Employee_Service.service.employee;
 
 import com.example.Employee_Service.enums.TypeLogVacationDayEnum;
-import com.example.Employee_Service.model.dto.request.employee.DeleteLogVacationRequest;
-import com.example.Employee_Service.model.dto.request.employee.GetListLogVacationByPersonSend;
-import com.example.Employee_Service.model.dto.request.employee.UpdateLogVacationDayRequest;
+import com.example.Employee_Service.model.dto.request.employee.*;
 import com.example.Employee_Service.model.dto.response.employee.GetListVacationResponse;
 import com.example.Employee_Service.service.jwt.JWTService;
 import com.the.common.exception.ErrorV2Exception;
-import com.example.Employee_Service.model.dto.request.employee.AddLogVacationDayRequest;
 import com.example.Employee_Service.model.entity.employee.EmployeeEntity;
 import com.example.Employee_Service.model.entity.employee.LogVacationDayEntity;
 import com.example.Employee_Service.repository.employee.LogVacationDayRepository;
@@ -76,7 +73,7 @@ public class LogVacationDayService extends BaseService {
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,
         entity);
   }
-
+  @Transactional(rollbackFor = Exception.class)
   public BaseResponse<?> update(UpdateLogVacationDayRequest request) {
     LogVacationDayEntity logVacationDayEntity = checkLogExist(request.getId());
     if (Boolean.FALSE.equals(logVacationDayEntity.getStatusApprove())) {
@@ -101,7 +98,7 @@ public class LogVacationDayService extends BaseService {
         SystemMessageCode.CommonMessage.UPDATE_SUCCESS,
         entity);
   }
-
+  @Transactional(rollbackFor = Exception.class)
   public BaseResponse<?> delete(DeleteLogVacationRequest request, HttpServletRequest httpServletRequest){
     LogVacationDayEntity entity = checkLogExist(request.getId());
     String uuid = getUUID(httpServletRequest);
@@ -136,7 +133,7 @@ public class LogVacationDayService extends BaseService {
    * @param httpServletRequest : HttpServletRequest
    * @return list log vacation by id assign
    */
-  public BaseResponse<?> getByAssign(GetListLogVacationByPersonSend request, HttpServletRequest httpServletRequest) {
+  public BaseResponse<?> getByAssign(GetListLogVacationByAssignRequest request, HttpServletRequest httpServletRequest) {
     Pageable pageable = buildPageable(request.getMeta());
     EmployeeEntity employee = employeeValidator.accountEmployeeExist(jwtService.getSubjectFromToken(jwtService.getTokenFromRequest(httpServletRequest)));
     Page<LogVacationDayEntity> values = logVacationDayRepository.getAllByIdAssign(employee.getId(), pageable);
@@ -145,6 +142,16 @@ public class LogVacationDayService extends BaseService {
     return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.GET_SUCCESS,
         new GetListVacationResponse(values.getContent(), metaList)
+    );
+  }
+  @Transactional(rollbackFor = Exception.class)
+  public BaseResponse<?> approveLog(ApproveLogVacationRequest request) {
+    checkLogExist(request.getId());
+    EmployeeEntity employee = employeeValidator.accountEmployeeExist(getCustomUserDetail().getUsername());
+    logVacationDayRepository.updateStatusApprove(request.getId(), employee.getId());
+    return responseV1(SystemMessageCode.CommonMessage.CODE_SUCCESS,
+        SystemMessageCode.CommonMessage.UPDATE_SUCCESS,
+        null
     );
   }
   /**

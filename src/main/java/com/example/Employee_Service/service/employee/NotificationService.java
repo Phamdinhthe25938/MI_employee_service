@@ -68,6 +68,8 @@ public class NotificationService extends BaseService {
       case 1 :
         value = List.of(Constants.Notification.TITLE_LOG_VACATION, String.format(Constants.Notification.CONTENT_LOG_VACATION, accountSend));
         break;
+      case 2 :
+        break;
       default:
         LOGGER.error("Type send notification invalid !");
     }
