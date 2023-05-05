@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetListLogVacationByPersonSend {
-  private Long idEmployee;
   private MetaList meta;
 }
