@@ -133,6 +133,12 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.14.1</version>
         </dependency>
+        <!-- ===== OPEN CV ====  -->
+        <dependency>
+            <groupId>org.openpnp</groupId>
+            <artifactId>opencv</artifactId>
+            <version>3.4.2-0</version>
+        </dependency>
 
         <!-- ===== WEB SOCKET ====  -->
         <dependency>

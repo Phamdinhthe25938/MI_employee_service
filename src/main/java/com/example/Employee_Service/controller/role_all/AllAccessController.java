@@ -1,8 +1,6 @@
 package com.example.Employee_Service.controller.role_all;
 
-import com.example.Employee_Service.model.dto.request.employee.AddLogVacationDayRequest;
-import com.example.Employee_Service.model.dto.request.employee.AddNotificationRequest;
-import com.example.Employee_Service.model.dto.request.employee.UpdateLogVacationDayRequest;
+import com.example.Employee_Service.model.dto.request.employee.*;
 import com.example.Employee_Service.model.dto.request.time_scan_manager.AddTimeScanRequest;
 import com.example.Employee_Service.model.dto.request.time_scan_manager.GetListTimeScanDetailRequest;
 import com.example.Employee_Service.service.employee.LogVacationDayService;
@@ -22,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:1010")
+@CrossOrigin(origins = {"*", "http://localhost:1010"})
 @RequestMapping("/api/all")
 public class AllAccessController {
   @Resource
@@ -61,6 +59,23 @@ public class AllAccessController {
   public ResponseEntity<?> updateLogVacation(@Valid @RequestBody UpdateLogVacationDayRequest request) {
     return new ResponseEntity<>(logVacationDayService.update(request), HttpStatus.OK);
   }
+  @DeleteMapping("/log-vacation/delete")
+  private ResponseEntity<?> deleteLogVacation(@Valid @RequestBody DeleteLogVacationRequest request, HttpServletRequest httpServletRequest) {
+    return new ResponseEntity<>(logVacationDayService.delete(request, httpServletRequest), HttpStatus.OK);
+  }
+  @GetMapping("/log-vacation/get-all-by-send")
+  private ResponseEntity<?> getByPersonSend(@RequestBody GetListLogVacationByPersonSend request, HttpServletRequest httpServletRequest) {
+    return new ResponseEntity<>(logVacationDayService.getByPersonSend(request, httpServletRequest), HttpStatus.OK);
+  }
+  @GetMapping("/log-vacation/get-all-by-assign")
+  private ResponseEntity<?> getByAssign(@RequestBody GetListLogVacationByAssignRequest request, HttpServletRequest httpServletRequest) {
+    return new ResponseEntity<>(logVacationDayService.getByAssign(request, httpServletRequest), HttpStatus.OK);
+  }
+  @GetMapping("/log-vacation/update-status-approve")
+  private ResponseEntity<?> updateStatusApprove(@Valid @RequestBody ApproveLogVacationRequest request) {
+    return new ResponseEntity<>(logVacationDayService.approveLog(request), HttpStatus.OK);
+  }
+
   /**
    * Notification real time
    */
