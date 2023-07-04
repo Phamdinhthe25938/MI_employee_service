@@ -28,4 +28,6 @@ public interface EmployeeRepository extends CrudRepository<EmployeeEntity, Long>
 
   @Query(nativeQuery = true, value = "select account from employee where status_work = :statusWork order by id asc ")
   List<String> getAllAccountName(@Param("statusWork") int status);
+
+  List<EmployeeEntity> getAllByStatusWork(Integer statusWork);
 }

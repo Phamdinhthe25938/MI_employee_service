@@ -54,8 +54,8 @@ public class AllAccessController {
   }
 
   @PostMapping("/log-vacation/save")
-  public ResponseEntity<?> saveLogVacation(@Valid @RequestBody AddLogVacationDayRequest request) {
-    return new ResponseEntity<>(logVacationDayService.save(request), HttpStatus.OK);
+  public ResponseEntity<?> saveLogVacation(@Valid @RequestBody AddLogVacationDayRequest request, BindingResult result) {
+    return new ResponseEntity<>(logVacationDayService.save(request, result), HttpStatus.OK);
   }
   @PutMapping("/log-vacation/update")
   public ResponseEntity<?> updateLogVacation(@Valid @RequestBody UpdateLogVacationDayRequest request) {
@@ -73,7 +73,7 @@ public class AllAccessController {
   private ResponseEntity<?> getByAssign(@RequestBody GetListLogVacationByAssignRequest request, HttpServletRequest httpServletRequest) {
     return new ResponseEntity<>(logVacationDayService.getByAssign(request, httpServletRequest), HttpStatus.OK);
   }
-  @GetMapping("/log-vacation/update-status-approve")
+  @PostMapping("/log-vacation/update-status-approve")
   private ResponseEntity<?> updateStatusApprove(@Valid @RequestBody ApproveLogVacationRequest request) {
     return new ResponseEntity<>(logVacationDayService.approveLog(request), HttpStatus.OK);
   }
@@ -81,7 +81,7 @@ public class AllAccessController {
   /**
    * Notification real time
    */
-  @MessageMapping("/test")
+  @MessageMapping("/send-notification")
   public ResponseEntity<?> sendNotification(@Payload AddNotificationRequest request, WebSocketSession session) {
     String authorization = session.getHandshakeHeaders().getFirst(Constants.AuthService.AUTHORIZATION);
     notificationService.save(request, authorization);

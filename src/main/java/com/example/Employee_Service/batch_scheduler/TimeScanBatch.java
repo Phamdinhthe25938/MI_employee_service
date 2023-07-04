@@ -17,10 +17,7 @@ import com.the.common.constant.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -47,7 +44,7 @@ public class TimeScanBatch {
   private EmployeeRepository employeeRepository;
   @Resource
   @Qualifier("TimeScanDateDetailRepository")
-  private TimeScanDateDetailRepository TimeScanDateDetailRepository;
+  private TimeScanDateDetailRepository timeScanDateDetailRepository;
   @Resource
   @Qualifier("EmployeeValidator")
   private EmployeeValidator employeeValidator;
@@ -59,82 +56,91 @@ public class TimeScanBatch {
 
 //  @Scheduled(cron = "${time.scan.scheduler}")
   @Transactional(rollbackFor = Exception.class)
-  public void timeScanBatch() {
-    List<String> allAccount = employeeRepository.getAllAccountName(StatusEmployeeEnum.WORKING.getCode());
+  public void run() {
+    try {
+      List<String> allAccount = employeeRepository.getAllAccountName(StatusEmployeeEnum.WORKING.getCode());
 
-    LocalDate currentDate = LocalDate.now();
-    LOGGER.info("Date now :" + currentDate);
-    LocalDate yesterday = currentDate.minusDays(1);
-    LOGGER.info("Date yesterday :" + yesterday);
-    int day = yesterday.getDayOfMonth();
-    int month = yesterday.getMonthValue();
-    int year = yesterday.getYear();
+      LocalDate currentDate = LocalDate.now();
+      LOGGER.info("Date now :" + currentDate);
+      LocalDate yesterday = currentDate.minusDays(1);
+      LOGGER.info("Date yesterday :" + yesterday);
+      int day = yesterday.getDayOfMonth();
+      int month = yesterday.getMonthValue();
+      int year = yesterday.getYear();
 
-    List<TimeScanEntity> timeScans = timeScanRepository.getAllByDateScanAndMonthScanAndYearScan(day, month, year);
-    allAccount.forEach(account -> {
-      executor.execute(() -> {
-        LogTimeScanEntity logTimeScanEntity = logTimeScanRepository.findByAccountAndDateWork(account, yesterday).orElse(null);
-        if (ObjectUtils.isEmpty(logTimeScanEntity) || Boolean.FALSE.equals(logTimeScanEntity.getStatus())) {
-          TimeScanDateDetailEntity timeScanDetail = null;
-          List<TimeScanEntity> timeScansByAccount = timeScans.stream().filter(item -> item.getAccountEmployee().equals(account)).collect(Collectors.toList());
-          EmployeeEntity employee = employeeValidator.accountEmployeeExist(account);
-          if (!CollectionUtils.isEmpty(timeScansByAccount)) {
-            LOGGER.info("Employee ---->  " + employee.toString());
-            TimeScanEntity timeScanInStart = timeScansByAccount.stream().filter(item -> TypeScanEnum.SCAN_IN.getCode().equals(item.getTypeScan())).min(Comparator.comparing(TimeScanEntity::getTimeScan)).orElse(null);
-            TimeScanEntity timeScanOutEnd = timeScansByAccount.stream().filter(item -> TypeScanEnum.SCAN_OUT.getCode().equals(item.getTypeScan())).max(Comparator.comparing(TimeScanEntity::getTimeScan)).orElse(null);
-            if (timeScanInStart != null && timeScanOutEnd != null) {
-              int statusWorkday;
-              LocalTime localTimeMax = timeScanOutEnd.getTimeScan().toLocalTime();
-              LocalTime localTimeMin = timeScanInStart.getTimeScan().toLocalTime();
-              if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME_DAY) && localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME_DAY)) {
-                statusWorkday = StatusWorkdayEnum.LATE_BACK_SOON.getCode();
-              } else if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME_DAY)) {
-                statusWorkday = StatusWorkdayEnum.BACK_SOON.getCode();
-              } else if (localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME_DAY)) {
-                statusWorkday = StatusWorkdayEnum.LATE.getCode();
+      List<TimeScanEntity> timeScans = timeScanRepository.getAllByDateScanAndMonthScanAndYearScan(day, month, year);
+      allAccount.forEach(account -> {
+        try {
+          executor.execute(() -> {
+            LogTimeScanEntity logTimeScanEntity = logTimeScanRepository.findByAccountAndDateWork(account, yesterday).orElse(null);
+            if (ObjectUtils.isEmpty(logTimeScanEntity) || Boolean.FALSE.equals(logTimeScanEntity.getStatus())) {
+              TimeScanDateDetailEntity timeScanDetail = null;
+              List<TimeScanEntity> timeScansByAccount = timeScans.stream().filter(item -> item.getAccountEmployee().equals(account)).collect(Collectors.toList());
+              EmployeeEntity employee = employeeValidator.accountEmployeeExist(account);
+              if (!CollectionUtils.isEmpty(timeScansByAccount)) {
+                LOGGER.info("Employee ---->  " + employee.toString());
+                TimeScanEntity timeScanInStart = timeScansByAccount.stream().filter(item -> TypeScanEnum.SCAN_IN.getCode().equals(item.getTypeScan())).min(Comparator.comparing(TimeScanEntity::getTimeScan)).orElse(null);
+                TimeScanEntity timeScanOutEnd = timeScansByAccount.stream().filter(item -> TypeScanEnum.SCAN_OUT.getCode().equals(item.getTypeScan())).max(Comparator.comparing(TimeScanEntity::getTimeScan)).orElse(null);
+                if (timeScanInStart != null && timeScanOutEnd != null) {
+                  int statusWorkday;
+                  LocalTime localTimeMax = timeScanOutEnd.getTimeScan().toLocalTime();
+                  LocalTime localTimeMin = timeScanInStart.getTimeScan().toLocalTime();
+                  if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME_DAY) && localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME_DAY)) {
+                    statusWorkday = StatusWorkdayEnum.LATE_BACK_SOON.getCode();
+                  } else if (localTimeMax.isBefore(Constants.TimeRegulations.WORK_END_TIME_DAY)) {
+                    statusWorkday = StatusWorkdayEnum.BACK_SOON.getCode();
+                  } else if (localTimeMin.isAfter(Constants.TimeRegulations.WORK_START_TIME_DAY)) {
+                    statusWorkday = StatusWorkdayEnum.LATE.getCode();
+                  } else {
+                    statusWorkday = StatusWorkdayEnum.ENOUGH.getCode();
+                  }
+                  if (timeScanOutEnd.getTimeScan().isAfter(timeScanInStart.getTimeScan())) {
+                    Duration duration = Duration.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
+                    long seconds = duration.getSeconds();
+                    long minutes = ChronoUnit.MINUTES.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
+                    long hours = ChronoUnit.HOURS.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
+                    long days = ChronoUnit.DAYS.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
+                    double numberWorkday = hours >= 6 ? 1 : 0.5;
+                    LOGGER.info("Date nax " + timeScanOutEnd.getTimeScan() + " Date min " + timeScanInStart.getTimeScan());
+                    LOGGER.info("Hour :" + hours + " Minutes :" + minutes + " Seconds :" + seconds + " Days :" + days);
+                    timeScanDetail = buildTimeScanDetailObject(employee, yesterday, timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan(), hours,
+                        StatusScanDetail.VALID.getCode(), statusWorkday, numberWorkday);
+                  } else {
+                    timeScanDetail = buildTimeScanDetailObject(employee, yesterday, timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan(), 0L,
+                        StatusScanDetail.IN_VALID.getCode(), statusWorkday, 0D);
+                  }
+                } else if (timeScanInStart != null) {
+                  timeScanDetail = buildTimeScanDetailObject(employee, yesterday, timeScanInStart.getTimeScan(), null, 0L,
+                      StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.BACK_SOON.getCode(), 0D);
+                } else if (timeScanOutEnd != null) {
+                  timeScanDetail = buildTimeScanDetailObject(employee, yesterday, null, timeScanOutEnd.getTimeScan(), 0L,
+                      StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.LATE.getCode(), 0D);
+                }
               } else {
-                statusWorkday = StatusWorkdayEnum.ENOUGH.getCode();
+                timeScanDetail = buildTimeScanDetailObject(employee, yesterday, null, null, 0L,
+                    StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.REST.getCode(), 0D);
               }
-              if (timeScanOutEnd.getTimeScan().isAfter(timeScanInStart.getTimeScan())) {
-                Duration duration = Duration.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
-                long seconds = duration.getSeconds();
-                long minutes = ChronoUnit.MINUTES.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
-                long hours = ChronoUnit.HOURS.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
-                long days = ChronoUnit.DAYS.between(timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan());
-                double numberWorkday = hours >= 6 ? 1 : 0.5;
-                LOGGER.info("Date nax " + timeScanOutEnd.getTimeScan() + " Date min " + timeScanInStart.getTimeScan());
-                LOGGER.info("Hour :" + hours + " Minutes :" + minutes + " Seconds :" + seconds + " Days :" + days);
-                timeScanDetail = buildTimeScanDetailObject(employee, yesterday, timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan(), hours,
-                    StatusScanDetail.VALID.getCode(), statusWorkday, numberWorkday);
-              } else {
-                timeScanDetail = buildTimeScanDetailObject(employee, yesterday, timeScanInStart.getTimeScan(), timeScanOutEnd.getTimeScan(), 0L,
-                    StatusScanDetail.IN_VALID.getCode(), statusWorkday, 0D);
+              if (!ObjectUtils.isEmpty(timeScanDetail)) {
+                timeScanDateDetailRepository.save(timeScanDetail);
               }
-            } else if (timeScanInStart != null) {
-              timeScanDetail = buildTimeScanDetailObject(employee, yesterday, timeScanInStart.getTimeScan(), null, 0L,
-                  StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.BACK_SOON.getCode(), 0D);
-            } else if (timeScanOutEnd != null) {
-              timeScanDetail = buildTimeScanDetailObject(employee, yesterday, null, timeScanOutEnd.getTimeScan(), 0L,
-                  StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.LATE.getCode(), 0D);
+              LogTimeScanEntity logTimeScan = new LogTimeScanEntity();
+              if (logTimeScanEntity == null) {
+                logTimeScan = LogTimeScanEntity.builder().account(account).dateWork(yesterday).status(Boolean.TRUE).build();
+              } else if (Boolean.FALSE.equals(logTimeScanEntity.getStatus())) {
+                logTimeScan = LogTimeScanEntity.builder().id(logTimeScan.getId()).account(account).dateWork(yesterday).status(Boolean.TRUE).build();
+              }
+              logTimeScanRepository.save(logTimeScan);
             }
-          } else {
-            timeScanDetail = buildTimeScanDetailObject(employee, yesterday, null, null, 0L,
-                StatusScanDetail.IN_VALID.getCode(), StatusWorkdayEnum.REST.getCode(), 0D);
-          }
-          if (!ObjectUtils.isEmpty(timeScanDetail)) {
-            TimeScanDateDetailRepository.save(timeScanDetail);
-          }
-          LogTimeScanEntity logTimeScan = new LogTimeScanEntity();
-          if (logTimeScanEntity == null) {
-            logTimeScan = LogTimeScanEntity.builder().account(account).dateWork(yesterday).status(Boolean.TRUE).build();
-          } else if (Boolean.FALSE.equals(logTimeScanEntity.getStatus())) {
-            logTimeScan = LogTimeScanEntity.builder().id(logTimeScan.getId()).account(account).dateWork(yesterday).status(Boolean.TRUE).build();
-          }
-          logTimeScanRepository.save(logTimeScan);
+          });
+        } catch (Exception e) {
+          LOGGER.error("Time scan employee " + account + " fails !" + e.getMessage());
         }
       });
-    });
+    } catch (Exception e) {
+      LOGGER.error("Time scan  error ====> " + e.getMessage());
+    }
   }
+
   private TimeScanDateDetailEntity buildTimeScanDetailObject(EmployeeEntity employee, LocalDate dateWork, LocalDateTime timeScanInStart, LocalDateTime timeScanOutEnd, Long timeReality, Integer statusScanWorkDay, Integer statusWorkDay, Double numberWorkday) {
     return TimeScanDateDetailEntity.builder()
         .accountEmployee(employee.getAccount())

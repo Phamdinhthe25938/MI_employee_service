@@ -19,6 +19,9 @@ public class UpdateLogVacationDayRequest {
   @Required(message = "Id not null")
   private Long id;
   @Min(1)
+  @Required(message = "{idVacationDay.is.required}")
+  private Long idVacationDay;
+  @Min(1)
   @Required(message = "{idAssign.is.required}")
   private Long idAssign;
   @Required(message = "{date.log.vacation.is.required}")

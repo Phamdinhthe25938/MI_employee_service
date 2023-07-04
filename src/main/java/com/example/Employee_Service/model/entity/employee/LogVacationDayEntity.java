@@ -24,6 +24,9 @@ public class LogVacationDayEntity extends BaseEntity {
   @Column(name = "id")
   private Long id;
   @NotNull
+  @Column(name = "id_vacation_day")
+  private Long idVacationDay;
+  @NotNull
   @Column(name = "id_employee")
   private Long idEmployee;
   @NotNull
