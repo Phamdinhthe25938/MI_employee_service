@@ -76,7 +76,7 @@ public class EmployeeService extends BaseService {
     employeeEntity.setStatusWork(StatusEmployeeEnum.WORKING.getCode());
     EmployeeEntity employee = employeeRepository.save(employeeEntity);
     partRepository.updateTotalMember(employee.getPartId());
-    sendInfoEmployeeAuthor(employee, httpServlet);
+//    sendInfoEmployeeAuthor(employee, httpServlet);
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,

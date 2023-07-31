@@ -26,6 +26,7 @@ public class EmployeeServiceApplication {
   private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceApplication.class);
   public static void main(String[] args) {
     SpringApplication.run(EmployeeServiceApplication.class, args);
+<<<<<<< Updated upstream
     System.loadLibrary("opencv_java470");
     // Load the training image
     LOGGER.info("Time start training " + LocalDateTime.now());
@@ -54,6 +55,8 @@ public class EmployeeServiceApplication {
     // Show the output image
     HighGui.imshow("People Detection", image);
     HighGui.waitKey();
+=======
+>>>>>>> Stashed changes
   }
 
 }

@@ -3,6 +3,7 @@ package com.example.Employee_Service.config.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.the.common.config.i18n.SmartLocaleResolver;
+import com.the.common.en_code.Base64Code;
 import com.the.common.validator.regex.RegexHelper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -100,6 +101,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     executor.setThreadNamePrefix("executor-");
     executor.initialize();
     return executor;
+  }
+
+  @Bean(name = "Base64Code")
+  public Base64Code base64Code() {
+    return new Base64Code();
   }
 }
 
