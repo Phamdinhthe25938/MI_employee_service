@@ -24,4 +24,8 @@ public class PartEntity {
 
   @Column(name = "total_member")
   private long totalMember = 0;
+
+  public void init() {
+    System.out.println("Custom initialization method is called.");
+  }
 }

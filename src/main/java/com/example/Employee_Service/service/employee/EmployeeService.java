@@ -10,8 +10,8 @@ import com.example.Employee_Service.service.jwt.JWTService;
 import com.example.Employee_Service.validate.employee.EmployeeValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.the.common.constant.Constants;
+import com.the.common.constant.kafka.KafkaTopic;
 import com.the.common.exception.ErrorV1Exception;
-import com.the.common.kafka.Topic;
 import com.the.common.model.payload.response.BaseResponse;
 import com.the.common.service.BaseService;
 import com.the.common.system_message.SystemMessageCode;
@@ -76,7 +76,7 @@ public class EmployeeService extends BaseService {
     employeeEntity.setStatusWork(StatusEmployeeEnum.WORKING.getCode());
     EmployeeEntity employee = employeeRepository.save(employeeEntity);
     partRepository.updateTotalMember(employee.getPartId());
-//    sendInfoEmployeeAuthor(employee, httpServlet);
+    sendInfoEmployeeAuthor(employee, httpServlet);
     return responseV1(
         SystemMessageCode.CommonMessage.CODE_SUCCESS,
         SystemMessageCode.CommonMessage.SAVE_SUCCESS,
@@ -92,7 +92,7 @@ public class EmployeeService extends BaseService {
               .email(employee.getEmailCompany())
               .telephone(employee.getTelephone())
               .build();
-      ProducerRecord<String, String> record = new ProducerRecord<>(Topic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
+      ProducerRecord<String, String> record = new ProducerRecord<>(KafkaTopic.TOPIC_REGISTRY_EMPLOYEE, objectMapper.writeValueAsString(employeeProducer));
       record.headers().add(new RecordHeader(Constants.AuthService.AUTHORIZATION, jwtService.getTokenFromRequest(httpServlet).getBytes()));
       record.headers().add(Constants.AuthService.UUID, employee.getUuid().getBytes());
       kafkaTemplate.send(record);

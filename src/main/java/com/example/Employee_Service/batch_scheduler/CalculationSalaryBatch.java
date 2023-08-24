@@ -16,6 +16,8 @@ import com.example.Employee_Service.validate.employee.EmployeeValidator;
 import com.the.common.enums.DaysOfWeekEnum;
 import com.the.common.service.BaseService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -27,28 +29,23 @@ import java.util.stream.Collectors;
 
 @Component
 public class CalculationSalaryBatch extends BaseService {
-  @Resource
-  @Qualifier("EmployeeRepository")
+  @Resource(name = "EmployeeRepository")
   private EmployeeRepository employeeRepository;
-  @Resource
-  @Qualifier("EmployeeValidator")
+  @Resource(name = "EmployeeValidator")
   private EmployeeValidator employeeValidator;
-  @Resource
-  @Qualifier("TimeScanDateDetailRepository")
+  @Resource(name = "TimeScanDateDetailRepository")
   private TimeScanDateDetailRepository timeScanDateDetailRepository;
-  @Resource
-  @Qualifier("ContractDetailValidator")
+  @Resource(name = "ContractDetailValidator")
   private ContractDetailValidator contractDetailValidator;
-  @Resource
-  @Qualifier("CalculationSalaryRepository")
+  @Resource(name = "CalculationSalaryRepository")
   private CalculationSalaryRepository calculationSalaryRepository;
-  @Resource
-  @Qualifier("LogCalculationSalaryRepository")
+  @Resource(name = "LogCalculationSalaryRepository")
   private LogCalculationSalaryRepository logCalculationSalaryRepository;
   @Resource(name = "threadPoolExecutor")
   private ThreadPoolTaskExecutor executor;
 
 //  @Scheduled(cron = "10 * * * * *")
+  @Async
   public void calculationSalary() {
     try {
       YearMonth currentMonth = YearMonth.now();
@@ -64,7 +61,7 @@ public class CalculationSalaryBatch extends BaseService {
       List<TimeScanDateDetailEntity> timeScanDateDetailByMonth = timeScanDateDetailRepository.getAllByMonth(firstDayOfMonth, lastDayOfMonth);
 
       allAccount.forEach(account -> {
-        executor.execute(() -> {
+        Runnable task = () -> {
           LogCalculationSalaryEntity logCalculationSalaryEntity = logCalculationSalaryRepository.findByAccountAndMonthWork(account, lastMonth).orElse(null);
           if (logCalculationSalaryEntity == null || Boolean.FALSE.equals(logCalculationSalaryEntity.getStatus())) {
 
@@ -127,7 +124,9 @@ public class CalculationSalaryBatch extends BaseService {
             }
             logCalculationSalaryRepository.save(logCalculationSalary);
           }
-        });
+        };
+        // run task
+        executor.execute(task);
       });
 
       LOGGER.error("[Logger of calculation salary :] ------>   Success !" );

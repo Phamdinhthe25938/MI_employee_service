@@ -1,5 +1,6 @@
 package com.example.Employee_Service.config.web;
 
+import com.example.Employee_Service.model.entity.employee.PartEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.the.common.config.i18n.SmartLocaleResolver;
@@ -7,9 +8,11 @@ import com.the.common.en_code.Base64Code;
 import com.the.common.validator.regex.RegexHelper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -106,6 +109,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
   @Bean(name = "Base64Code")
   public Base64Code base64Code() {
     return new Base64Code();
+  }
+
+  @Bean(name = "PartEntity", initMethod = "init")
+  @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+  public PartEntity PartEntity() {
+    return new PartEntity();
   }
 }
 
