@@ -52,7 +52,7 @@ public class EmployeeServiceApplication {
   @KafkaListener(topics = "my-topic-1")
   public void ok(ConsumerRecord<String, String> record) {
 //    if (record.offset() >= 21 && record.offset() <= 23) {
-    System.out.println("Partition log : " + record.partition() + " " + record.key());
+    System.out.println("Partition log 1: " + record.partition() + " " + record.key());
     System.out.println("Received message: " + record.value());
 //    }
   }
