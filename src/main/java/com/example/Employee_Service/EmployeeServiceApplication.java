@@ -43,7 +43,7 @@ public class EmployeeServiceApplication {
     KafkaTemplate<String, String> kafkaTemplate = (KafkaTemplate<String, String>) application.getBean("KafkaTemplate");
     ProducerRecord<String, String> record = new ProducerRecord<>("my-topic-1", 2, "123", "ricky start 1");
     kafkaTemplate.send(record);
-    LOGGER.info("Send message 1 success !");
+    LOGGER.info("Send message 1 success okkkkkkkkkkkkkkkkkkkkkkkkkkkk!");
     Thread.sleep(5000);
     ProducerRecord<String, String> record2 = new ProducerRecord<>("my-topic-1", "ricky start 2");
     kafkaTemplate.send("my-topic-1", "ricky start 2");
